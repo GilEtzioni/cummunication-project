@@ -4,7 +4,7 @@ import socket
 # send up to 40 bytes throws an error on failure
 def SendFrame(bytes: bytes):
 
-
+    assert len(bytes) <= 40, "trying to send too large a frame"
     s = socket.socket()         
 
     port = 1234              
