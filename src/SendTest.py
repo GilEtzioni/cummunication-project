@@ -1,4 +1,4 @@
-from transport.socketTransport import SendFrame
+from Transports.SocketTransport.SocketTransport import SendFrame
 
 # example of how to send a frame
 def Send():
