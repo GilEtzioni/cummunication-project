@@ -1,5 +1,14 @@
 {
+    // images pwd - not in use right now
+    "paths": {
+        "sendLogoPath": "${workspaceFolder}/src/sendLogo.png",
+        "recvLogoPath": "${workspaceFolder}/src/recvLogo.png"
+    },
+
     "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}/src::${workspaceFolder}/src/Transports/AudioTransport:${workspaceFolder}/src/Transports/${env:PYTHONPATH}"
+    },
+    "terminal.integrated.env.osx": {
         "PYTHONPATH": "${workspaceFolder}/src::${workspaceFolder}/src/Transports/AudioTransport:${workspaceFolder}/src/Transports/${env:PYTHONPATH}"
     },
     "python.analysis.extraPaths": [

@@ -5,7 +5,7 @@ import time
 import logging
 import LogSetup
 
-logger = LogSetup.SetupLogger("AudioTransport", logging.DEBUG)
+logger = LogSetup.SetupLogger("[AudioTransport.py]", logging.DEBUG)
 # We might want to add retries and timeouts to this layer
 
 def RecvFrame() -> bytes:
@@ -28,7 +28,9 @@ def RecvFrame() -> bytes:
     
 def SendFrame(data: bytes,retries = 3)-> bool:
     """Send Frame of up to 40 bytes and return True if successful False if not"""
-    logger.info("Sending frame",data)
+    # logger.info("Sending frame",data)
+    logger.info(f"Sending frame: {data}")
+
     
     SendFrameRaw((data))
     

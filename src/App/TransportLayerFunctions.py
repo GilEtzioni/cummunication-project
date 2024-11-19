@@ -6,6 +6,7 @@ import time
 
 # splits the file into chunks(40 bytes) ()
 def SendFile(filepath: str):
+    print("[Transport Layer] in SendFile")
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"[Transport Layer] File '{filepath}' does not exist.")
 
@@ -43,6 +44,7 @@ def SendFile(filepath: str):
 
 # get a file header and its content, then writes the file to the output directory 
 def ReceiveFile(output_dir: str) -> str:
+    print("[TransportLayerFunctions.py] in ReceiveFile")
     # get the header
     header_bytes = RecvFrame()
     header = DeserializeHeader(header_bytes)
@@ -76,6 +78,7 @@ def ReceiveFile(output_dir: str) -> str:
 # converts the header dictionary into a byte array
 # ensures the header (filename length, filename, and file length) can be sent in 0/1 over the network
 def SerializeHeader(header: dict) -> bytes:
+    print("[Transport Layer] in SerializeHeader")
 
     filename = header["FileName"].encode('utf-8')
     serialized = (
@@ -89,6 +92,7 @@ def SerializeHeader(header: dict) -> bytes:
 # converts a byte array into a header dictionary
 # allows the receiver to interpret metadata (like filename and file size) before processing the file content.
 def DeserializeHeader(header_bytes: bytes) -> dict:
+    print("[Transport Layer] in DeserializeHeader")
     file_name_len = int.from_bytes(header_bytes[:4], 'big')
     filename = header_bytes[4:36].rstrip(b'\0').decode('utf-8')
     file_len = int.from_bytes(header_bytes[36:], 'big')
