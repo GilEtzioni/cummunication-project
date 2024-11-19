@@ -1,15 +1,38 @@
 import tkinter as tk
 
-def custom_print(*args, **kwargs):
-    """Redirect print statements to both the terminal and the output_text widget."""
-    
-    # Print to the terminal (console)
-    print(*args)
-    
-    # Get output_text from kwargs to insert into the Text widget in the GUI
-    output_text = kwargs.get('output_text')  # Get output_text from kwargs
-    if output_text:
-        output_text.configure(state="normal")
-        output_text.insert(tk.END, " ".join(map(str, args)) + "\n")  # Insert the message into the Text widget
-        output_text.configure(state="disabled")  # Disable editing the Text widget
-        output_text.yview(tk.END)  # Scroll to the bottom of the Text widget
+# global variables
+root = None
+output_text = None
+
+def initialize_gui(application_root):
+    global root, output_text
+    root = application_root
+    # create a default output text
+    output_text = tk.Text(root, wrap="word", height=20, width=60)
+    output_text.pack(padx=10, pady=10, expand=True, fill="both")
+    output_text.configure(state="disabled")  # Make it read-only initially
+
+def dual_print(message, tag="stdout", parent=None):
+    global root, output_text
+
+    print(message)  # print to the terminal
+
+    # if parent is provided, create a local Text widget
+    if parent:
+        local_text = tk.Text(parent, wrap="word", height=10, width=40)
+        local_text.pack(padx=10, pady=10, expand=True, fill="both")
+        local_text.insert("end", message + "\n", tag)
+        local_text.see("end")  
+        return
+
+    # print to the global Text widget
+    if root is None or output_text is None:
+        raise RuntimeError("GUI not initialized. Call initialize_gui(root) first.")
+
+    output_text.configure(state="normal")  
+    output_text.insert("end", message + "\n", tag)
+    output_text.configure(state="disabled") 
+    output_text.see("end") 
+
+    # GUI update GUI immediately
+    root.update_idletasks()
