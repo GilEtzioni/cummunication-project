@@ -1,5 +1,5 @@
-from AudioTransport.PhysicalLayer.recvSound import startAudioListener   
-from AudioTransport.PhysicalLayer.SendRaw import RawSend
+from PhysicalLayer.recvSound import startAudioListener   
+from PhysicalLayer.SendRaw import RawSend
 import time
 import logging
 import LogSetup
@@ -58,7 +58,7 @@ def _DecodeAudioFrame(data) -> bytes:
     """Verify checksum and return data if valid return None if invalid"""
     logger.debug(f"decoding data: {data}")
     logger.debug(f"comparing checksum with received  {int(_calculateChecksum(data[0:-1]))}, {int(data[-1])}")
-      
+    
     if _calculateChecksum(data[0:-1]) == data[-1]:
         return data[0:-1]
     return None

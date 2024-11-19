@@ -10,7 +10,7 @@ SendControlBlocks= 1
 SendAmplitude = 1
 
 RecvSampleRate = 41200.0
-RecvBlockSizeMs = 300
+RecvBlockSizeMs = 100
 RecvFrameSizeMs = 1
 
 
