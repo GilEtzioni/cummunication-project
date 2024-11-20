@@ -1,7 +1,5 @@
 import os
 from Transports.AudioTransport.DataLayer.AudioTransport import SendFrame, RecvFrame
-# from Transports.SocketTransport.SocketTransport import SendFrame, RecvFrame
-
 import time
 
 # splits the file into chunks(40 bytes) ()
@@ -47,6 +45,7 @@ def ReceiveFile(output_dir: str) -> str:
     print("[TransportLayerFunctions.py] in ReceiveFile")
     # get the header
     header_bytes = RecvFrame()
+    print("[TransportLayerFunctions.py] funished RecvFrame")
     header = DeserializeHeader(header_bytes)
     print(f"[Transport Layer] Received header: {header}")
 

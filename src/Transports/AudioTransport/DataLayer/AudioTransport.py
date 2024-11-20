@@ -17,6 +17,7 @@ def RecvFrame() -> bytes:
     
     if received == None:
         # failed receiving frame send '0' to sender so it can resend
+        logger.error("\n\n ----------------------------------------------------------------------")
         logger.error("Error receiving frame")
         SendFrameRaw(b'0')
         return None
