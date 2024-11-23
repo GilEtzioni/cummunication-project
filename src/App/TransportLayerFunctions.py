@@ -3,7 +3,7 @@ import time
 import LogSetup
 
 CHUNK = 40
-MAX_HEADER = 256
+MAX_HEADER = 40
 
 logger = LogSetup.SetupLogger("TransportLayer")
 
@@ -133,9 +133,6 @@ def CreateHeader(header: dict) -> bytes:
 # unpacks the byte array back into a header dictionary for interpretation.
 def UnpackHeader(header_bytes: bytes) -> dict:
     try:
-        if len(header_bytes) != MAX_HEADER:
-            logger.error("Header size mismatch.")
-            raise ValueError("Invalid header size.")
         
         logger.info("in UnpackHeader")
         file_name_len = int.from_bytes(header_bytes[:4], 'big')         # first 4 bytes from the header     -> int
