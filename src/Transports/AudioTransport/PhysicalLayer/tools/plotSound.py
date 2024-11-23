@@ -9,8 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sounddevice as sd
 import matplotlib
-from AudioTransport.PhysicalLayer.RecvRaw import fftChunk,processChunk
 # matplotlib.use('Agg') 
+def fftChunk(chunkData):
+    return np.abs(np.fft.rfft(chunkData,n=fftsize))[lowFreqIndex: lowFreqIndex+conf.FrequencySteps]
 
 
 

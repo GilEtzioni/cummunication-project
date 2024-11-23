@@ -1,16 +1,18 @@
 
-StartFrequency = 10000.0
+StartFrequency = 1000.0
 MaxFrequency = 20000.0
-FrequencySteps = 270
+FrequencySteps = 256
 
 
+# SendSampleRate = 192000.0
 SendSampleRate = 41200.0
-SendDataBlocks = 2
-SendControlBlocks= 1
-SendAmplitude = 1
+SendDataBlocks = 4
+SendAmplitude = 0.5
 
+# RecvSampleRate = 192000.0
 RecvSampleRate = 41200.0
-RecvBlockSizeMs = 100
+
+RecvBlockSizeMs = 50
 RecvFrameSizeMs = 1
 
 
