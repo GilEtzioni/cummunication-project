@@ -50,15 +50,16 @@ def calcChecksum(samples):
 
 # check frames after we go to calc final snr
 def tryGetValidFrame(srcData):
-
-    dataLen = srcData[-1]
+    if 65 != srcData[-2] or 65!=srcData[-1]:
+        return None
+    dataLen = srcData[-3]
     
     if(dataLen>len(srcData)-5) or dataLen<1:
         return None
   
     chksum = calcChecksum(srcData[-5-dataLen:-5])
     
-    recvChkSum = int.from_bytes(srcData[-5:-1],"big")
+    recvChkSum = int.from_bytes(srcData[-5:-3],"big")
     # if checksum matches then it is valid
     if chksum == recvChkSum: 
         return srcData[-5-dataLen:-5]
@@ -76,11 +77,11 @@ def findFrame(sampleVals,sampleSigs,sampleNoises):
     
     totalNoise = int(sum(relevantNoises))+0.1
     totalSignal =  int(sum(relevantSigs))
-# For printing out the samples for debug purposes
-    # for sample in relevantVals:
-    #     # if sample.noise==0:
-    #     print(sample,end=" ")
-    # print(f"snr: {totalSignal/totalNoise}")
+# # For printing out the samples for debug purposes
+#     for sample in relevantVals:
+#         # if sample.noise==0:
+#         print(sample,end=" ")
+#     print(f"snr: {totalSignal/totalNoise}")
   
     # print (f"chksum {chksum} last {relevantSamples[-1]}")
     # we can save processing time if we have a start sequence maybe a smaller checksum

@@ -11,6 +11,10 @@
     "terminal.integrated.env.osx": {
         "PYTHONPATH": "${workspaceFolder}/src::${workspaceFolder}/src/Transports/AudioTransport:${workspaceFolder}/src/Transports/${env:PYTHONPATH}"
     },
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}\\src::${workspaceFolder}\\src\\Transports/AudioTransport:${workspaceFolder}/src/Transports/${env:PYTHONPATH}"
+    },
+    "python.envFile": "${workspaceFolder}/.env",
     "python.analysis.extraPaths": [
         "${workspaceFolder}/src/Transports/AudioTransportLibs", 
         "${workspaceFolder}/src/Transports/"

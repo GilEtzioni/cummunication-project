@@ -1,5 +1,5 @@
 # TODO change the names of the modules
-from PhysicalLayer.Receiver import RecvFrameRaw   
+from AudioTransport.PhysicalLayer.Receiver import RecvFrameRaw   
 from AudioTransport.PhysicalLayer.Sender import SendFrameRaw
 import time
 import logging
@@ -11,10 +11,8 @@ logger = LogSetup.SetupLogger("[AudioTransport.py]", logging.DEBUG)
 def RecvFrame() -> bytes:
     """Receive Frame and return it or None if invalid"""
     logger.debug("Receiving raw frame:")
-    received = RecvFrameRaw()
-  
-    time.sleep(1.5)
-    
+    received,_ = RecvFrameRaw()
+      
     if received == None:
         # failed receiving frame send '0' to sender so it can resend
         logger.error("\n\n ----------------------------------------------------------------------")
@@ -36,10 +34,9 @@ def SendFrame(data: bytes,retries = 3)-> bool:
     SendFrameRaw((data))
     
     # Todo when working with two computers we can remove this sleep
-    time.sleep(0.5)
-    received = RecvFrameRaw()
+    received,_ = RecvFrameRaw()
     if received!=b'1':
-        logger.error("Frame not sent successfully")
+        logger.error(f"Frame not sent successfully {received}")
         return
     
     logger.info("Frame sent successfully")
