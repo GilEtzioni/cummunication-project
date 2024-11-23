@@ -2,7 +2,11 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from RecvTest import Recv
 from SendTest import Send
-from GuiHelpers import custom_print
+from LogSetup import  SetupLogger
+import logging
+from GuiHelpers import GuiHandler
+
+logger = SetupLogger("[main.py]", logging.DEBUG)
 
 def load_image(path, size):
     """Load and resize an image."""
@@ -60,7 +64,7 @@ def show_main_menu():
 def show_receiver_view():
     """Switch to the receiver view."""
     global current_frame
-    custom_print("[main.py] Switching to Receiver", output_text=output_text)
+    logger.info("Switching to Receiver")
 
     if current_frame is not None:
         current_frame.destroy()
@@ -76,7 +80,7 @@ def show_receiver_view():
 def show_sender_view():
     """Switch to the sender view."""
     global current_frame
-    custom_print("[main.py] Switching to Sender", output_text=output_text)
+    logger.info("Switching to Sender")
 
     if current_frame is not None:
         current_frame.destroy()
@@ -98,5 +102,8 @@ current_frame = None
 output_text = tk.Text(root, state="disabled", height=5)
 output_text.pack(side=tk.BOTTOM, fill=tk.X)
 
+# this sets all logs to go through the handler funtion
+logging.getLogger().addHandler(GuiHandler(output_text))
+logging.getLogger().setLevel(logging.INFO)
 show_main_menu()
 root.mainloop()

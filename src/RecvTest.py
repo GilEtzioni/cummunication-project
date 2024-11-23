@@ -2,8 +2,10 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 from App.ApplicationLayerFunctions import ReceiveAndSaveFile
-from GuiHelpers import custom_print
-
+from LogSetup import SetupLogger
+import logging
+logger = SetupLogger("[RecvTest.py]", logging.DEBUG)  
+# TODO move prints to work with logger
 selected_folder = None
 
 def Recv(receiver_frame, output_text): 

@@ -2,13 +2,16 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 from App.ApplicationLayerFunctions import TransferFile
-from GuiHelpers import custom_print  
+from LogSetup import SetupLogger
+import logging
+logger = SetupLogger("[SendTest]", logging.DEBUG)  
+# TODO move prints to work with logger
 
 selected_file_path = None 
 
 def Send(sender_frame, output_text): 
     global selected_file_path  
-
+    logger.info(f"Preparing to send file: {selected_file_path}")
     # open a file dialog to select a file to send
     def open_file_dialog():
 
