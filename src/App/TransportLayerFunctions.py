@@ -1,4 +1,4 @@
-from Transports.AudioTransport.DataLayer.AudioTransport import SendFrame, RecvFrame
+from Transports.AudioTransport.DataLayer.AudioTransport import SendFrame,RecvFrame
 import time
 import LogSetup
 
@@ -18,7 +18,7 @@ def SendFile(filepath, filelen, filename):
     # FileNamelen: int     \x00\x00\x00\x0b
     # FileName: string      example.txt\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
     # FileLen: int          \x00\x00\x00x
-
+    frameNumber = 0
     try:
         # create the header
         header = {
@@ -29,12 +29,24 @@ def SendFile(filepath, filelen, filename):
         header_bytes = CreateHeader(header)          # convert header to bytes
         logger.info(f"Sending header: {header}")
 
-        SendFrame(header_bytes)
-
+        SendFrame(header_bytes,frameNumber)  # send the header
+        frameNumber += 1
         # ----------------------------- without the delay .pdf will fail! -----------------------------
         time.sleep(0.02)
 
-        SendAsParts(filepath, filelen, sending=True)
+        logger.info(f"Sending file content in chunks of {CHUNK} bytes...")
+        try:
+            with open(filepath, "rb") as f:  # read
+                chunk_number = 0
+                while chunk := f.read(CHUNK):
+                    chunk_number += 1
+                    logger.debug(f"Sending chunk {chunk_number}: {chunk}")
+                    SendFrame(chunk,frameNumber)
+                    frameNumber += 1
+                    time.sleep(0.005)  # delay between chunks (LESS THAN 0.005 WILL PROBABLY FAIL!!!)
+        except Exception as e:
+            logger.error(f"Error while sending file parts: {e}")
+            raise
 
         logger.info(f"File '{filename}' sent successfully.")
     except Exception as e:
@@ -45,9 +57,10 @@ def SendFile(filepath, filelen, filename):
 # get a file header and its content, then writes the file to the output directory 
 def ReceiveFile(output_dir: str) -> str:
     logger.info("in ReceiveFile")
-
+    nextFrameNumber = 0
     try:
-        header_bytes = RecvFrame()
+        header_bytes = RecvFrame(nextFrameNumber)
+        nextFrameNumber += 1
 
         if len(header_bytes) != MAX_HEADER:
             logger.error("Invalid header size received.")
@@ -60,9 +73,23 @@ def ReceiveFile(output_dir: str) -> str:
         filelen = header["FileLen"]
 
         filepath = f"{output_dir}/{filename}"
+        # receive and save the file in chunks
+        try:
+            with open(filepath, "wb") as f:  # write
+                received_len = 0
 
-        # pass the filename and file length to SendAsParts for receiving
-        SendAsParts(filepath, filelen, sending=False)
+                while received_len < filelen:
+                    chunk = RecvFrame(nextFrameNumber)
+      
+    
+                    valid_chunk_size = min(filelen - received_len, len(chunk))
+                    logger.debug(f"Received chunk {nextFrameNumber}: {chunk[:valid_chunk_size]}")
+                    nextFrameNumber += 1
+                    f.write(chunk[:valid_chunk_size])
+                    received_len += valid_chunk_size
+        except Exception as e:
+            logger.error(f"Error while receiving file parts: {e}")
+            raise
 
         logger.info(f"File '{filename}' has been processed.")
         return filename
@@ -70,40 +97,6 @@ def ReceiveFile(output_dir: str) -> str:
     except Exception as e:
         logger.error(f"Error in ReceiveFile: {e}")
         raise
-
-
-# receive and save the file in chunks OR send the file in chunks
-def SendAsParts(filepath: str, filelen: int, sending: bool):
-    if sending:
-        # send the file in 40-byte chunks (CONSTANT)
-        logger.info(f"Sending file content in chunks of {CHUNK} bytes...")
-        try:
-            with open(filepath, "rb") as f:  # read
-                chunk_number = 0
-                while chunk := f.read(CHUNK):
-                    chunk_number += 1
-                    logger.debug(f"Sending chunk {chunk_number}: {chunk}")
-                    SendFrame(chunk)
-                    time.sleep(0.005)  # delay between chunks (LESS THAN 0.005 WILL PROBABLY FAIL!!!)
-        except Exception as e:
-            logger.error(f"Error while sending file parts: {e}")
-            raise
-    else:
-        # receive and save the file in chunks
-        try:
-            with open(filepath, "wb") as f:  # write
-                received_len = 0
-                chunk_number = 0
-                while received_len < filelen:
-                    chunk = RecvFrame()
-                    chunk_number += 1
-                    valid_chunk_size = min(filelen - received_len, len(chunk))
-                    logger.debug(f"Received chunk {chunk_number}: {chunk[:valid_chunk_size]}")
-                    f.write(chunk[:valid_chunk_size])
-                    received_len += valid_chunk_size
-        except Exception as e:
-            logger.error(f"Error while receiving file parts: {e}")
-            raise
 
 
 # converts the header dictionary into a byte array

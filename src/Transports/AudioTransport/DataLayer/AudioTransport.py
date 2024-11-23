@@ -1,6 +1,6 @@
 # TODO change the names of the modules
-from AudioTransport.PhysicalLayer.Receiver import RecvFrameRaw   
-from AudioTransport.PhysicalLayer.Sender import SendFrameRaw
+from AudioTransport.PhysicalLayer.RawReceiver import RecvFrameRaw   
+from AudioTransport.PhysicalLayer.RawSender import SendFrameRaw
 import time
 import logging
 import LogSetup
@@ -8,38 +8,44 @@ import LogSetup
 logger = LogSetup.SetupLogger("[AudioTransport.py]", logging.DEBUG)
 # We might want to add retries and timeouts to this layer
 
-def RecvFrame() -> bytes:
+
+def RecvFrame(expectedFrameNum) -> bytes:
     """Receive Frame and return it or None if invalid"""
-    logger.debug("Receiving raw frame:")
-    received,_ = RecvFrameRaw()
-      
-    if received == None:
-        # failed receiving frame send '0' to sender so it can resend
-        logger.error("\n\n ----------------------------------------------------------------------")
-        logger.error("Error receiving frame")
-        SendFrameRaw(b'0')
-        return None
-    
+    logger.info(f"Receiving raw frame number {expectedFrameNum}")
+    expectedFrameNum = expectedFrameNum%256
+    while True:
+        received,_ = RecvFrameRaw()
+        print (int(received[0]))
+        print (expectedFrameNum)
+        if int(received[0]) == expectedFrameNum:
+            break
+        logger.warning(f"received frame {int(received[0])} twice")
+        SendFrameRaw(b'1')
+        
     logger.info(f"Frame received successfully: {received}")
-    # send '1' to sender to indicate frame was received successfully
+    # respond to sender to indicate that the frame was received
     SendFrameRaw(b'1')
-    return received
+    return received[1:]
     
-def SendFrame(data: bytes,retries = 3)-> bool:
+def SendFrame(data: bytes,frameNumber: int,retries = 3)-> bool:
     """Send Frame of up to 40 bytes and return True if successful False if not"""
-    # logger.info("Sending frame",data)
     logger.info(f"Sending frame: {data}")
 
-    
-    SendFrameRaw((data))
-    
-    # Todo when working with two computers we can remove this sleep
-    received,_ = RecvFrameRaw()
-    if received!=b'1':
-        logger.error(f"Frame not sent successfully {received}")
+    for _ in range(retries):
+        SendFrameRaw((frameNumber%256).to_bytes(1)+data)
+        
+        # allow for 3 seconds for the receiver to respond
+        try:
+            received,_ = RecvFrameRaw(timeout = 3)
+        except TimeoutError:
+            logger.warning("Timeout receiving ACK from receiver")
+            continue
+        logger.error(f"Frame sent successfully {received}")
         return
     
-    logger.info("Frame sent successfully")
+    logger.info("Frame sending failed")
+    raise Exception(f"Frame sending failed after {retries} retries")
+
 
 
 if __name__ == "__main__":

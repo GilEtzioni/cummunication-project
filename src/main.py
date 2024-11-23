@@ -102,7 +102,7 @@ current_frame = None
 output_text = tk.Text(root, state="disabled", height=5)
 output_text.pack(side=tk.BOTTOM, fill=tk.X)
 
-# this sets all logs to go through the handler funtion
+# this sets all logs to go through the handler function
 logging.getLogger().addHandler(GuiHandler(output_text))
 logging.getLogger().setLevel(logging.INFO)
 show_main_menu()

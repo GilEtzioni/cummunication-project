@@ -1,9 +1,9 @@
-from AudioTransport.PhysicalLayer.Receiver import *
-from AudioTransport.PhysicalLayer.Sender import *
+from AudioTransport.PhysicalLayer.RawReceiver import *
+from AudioTransport.PhysicalLayer.RawSender import *
 import os
 
 def test_footer():
-    data = b'0'+ os.urandom(39)
+    data = b'0' + os.urandom(39)
     frame = addFooter(data)
     ret = tryGetValidFrame(frame)
     assert ret == data

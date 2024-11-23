@@ -8,7 +8,7 @@ import LogSetup
 
 logger = LogSetup.SetupLogger("Receiver", logging.DEBUG)
 # fftsize calcInterval maxFrameSize
-maxFrameSize = 40+5
+maxFrameSize = 41+5
 fftsize = int(conf.RecvSampleRate*conf.RecvBlockSizeMs//1000)
 calcIntervalMs= 1
 samplesPerByte = conf.SendDataBlocks*conf.RecvBlockSizeMs//calcIntervalMs

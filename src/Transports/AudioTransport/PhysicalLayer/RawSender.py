@@ -11,7 +11,7 @@ import numpy as np
 import sounddevice as sd
 import logging
 import LogSetup
-logger = LogSetup.SetupLogger("Sender", logging.DEBUG)
+logger = LogSetup.SetupLogger("Sender", logging.INFO)
 
 
 

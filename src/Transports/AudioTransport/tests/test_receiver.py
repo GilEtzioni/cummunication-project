@@ -1,5 +1,5 @@
 import numpy as np
-from AudioTransport.PhysicalLayer.Receiver import RecvFrameRaw
+from AudioTransport.PhysicalLayer.RawReceiver import RecvFrameRaw
 
 
 def test_RecvFrameRaw_Timeout():
