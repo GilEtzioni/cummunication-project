@@ -60,7 +60,6 @@ def tryGetValidFrame(srcData):
     chksum = calcChecksum(srcData[-5-dataLen:-5])
     
     recvChkSum = int.from_bytes(srcData[-5:-3],"big")
-    recvChkSum = int.from_bytes(srcData[-5:-3],"big")
     # if checksum matches then it is valid
     if chksum == recvChkSum: 
         return srcData[-5-dataLen:-5]
