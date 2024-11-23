@@ -15,7 +15,7 @@ def test_SendRecvWaveForm():
     # data = os.urandom(39)
     data = b"111111"
     frame = addFooter(data)
-    waveForm = GenerateWaveform(frame)
+    waveForm = GenerateWaveform(frame+b'0')
     receiver = AudioReceiver()
     ret = None
     for i in range(0,len(waveForm),calcIntervalSamples):

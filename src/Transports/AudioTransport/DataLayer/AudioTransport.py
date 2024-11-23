@@ -37,9 +37,9 @@ def SendFrame(data: bytes,retries = 3)-> bool:
     
     # Todo when working with two computers we can remove this sleep
     time.sleep(0.5)
-    received = RecvFrameRaw()
+    received,_ = RecvFrameRaw()
     if received!=b'1':
-        logger.error("Frame not sent successfully")
+        logger.error(f"Frame not sent successfully {received}")
         return
     
     logger.info("Frame sent successfully")

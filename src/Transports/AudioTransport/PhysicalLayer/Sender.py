@@ -7,7 +7,6 @@
 """Play a sine signal."""
 import AudioTransport.PhysicalLayer.conf as conf
 import numpy as np
-from scipy.io import wavfile
 # import matplotlib.pyplot as plt
 import sounddevice as sd
 import logging
@@ -33,16 +32,6 @@ class AudioEncoder:
         data = self.ByteToWaveformPhased(byte,conf.SendSampleRate)
         return data
     
-    def encodeStart(self):
-        """encode a start signal that is use to sync the sender and receiver"""
-        logger.info("encoding start signal")
-        output =np.array([])
-        wav257 = self.ByteToWaveformPhased(0,conf.SendSampleRate)
-        wav258 = self.ByteToWaveformPhased(1,conf.SendSampleRate)
-        output = np.concatenate((wav257,wav258,wav257))
-   
-        return output
-    
     def ByteToWaveformPhased(self,byte, sampleRate=conf.SendSampleRate, lengthMult=conf.SendDataBlocks):
         freq = self.usedFreqs[int(byte)]
         logger.debug(f"encoding {int(byte)} as {freq}")
@@ -65,9 +54,9 @@ def plotWaveform(waveForm):
     
 def addFooter(data):
     # 4 bytes is to much for regular chksum 40*256 can only go so high
-    chksum = sum(data).to_bytes(4,byteorder='big')
+    chksum = sum(data).to_bytes(2,byteorder='big')
     logger.debug(f"Checksum: {chksum}")
-    return data +chksum + bytes([len(data)])    
+    return data +chksum + bytes([len(data)]) +b'AA'   
 
 def GenerateWaveform(data):
     encoder = AudioEncoder()
