@@ -1,116 +1,102 @@
-import socket
-import threading
 import tkinter as tk
-from tkinter import filedialog, messagebox, scrolledtext
-import time
-# from  Transports.SocketTransport.SocketTransport import SendFrame,RecvFrame
-from  Transports.AudioTransport.AudioTransport import SendFrame,RecvFrame
+from PIL import Image, ImageTk
+from RecvTest import Recv
+from SendTest import Send
+from GuiHelpers import custom_print
 
-# server GUI
-class FileReceiverApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("File Receiver")
-        
-        self.text_area = scrolledtext.ScrolledText(root, width=50, height=15)
-        self.text_area.pack(pady=10)
-        
-        self.status_label = tk.Label(root, text="Waiting for incoming files...")
-        self.status_label.pack(pady=5)
+def load_image(path, size):
+    """Load and resize an image."""
+    image = Image.open(path)
+    image = image.resize(size, Image.Resampling.LANCZOS)
+    return ImageTk.PhotoImage(image)
 
-    def update_text_area(self, message):
-        self.root.after(0, self._update_text_area, message)
+def clear_output():
+    """Clear the output text box."""
+    global output_text
+    output_text.configure(state="normal")
+    output_text.delete("1.0", tk.END)
+    output_text.configure(state="disabled")
 
-    def _update_text_area(self, message):
-        self.text_area.insert(tk.END, message + "\n")
-        self.text_area.see(tk.END)  # Scroll to the end
+def show_main_menu():
+    """Display the main menu."""
+    global current_frame
 
-# server functionality
-def start_server(app, host='127.0.0.1', port=12345):
-    while True:
-        data = RecvFrame()
-        print("received: ",data)
-        # app.update_text_area(f"Received data: {data.decode()}")
-    # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    #     s.bind((host, port))
-    #     s.listen(1)
-    #     app.update_text_area(f"Server listening on {host}:{port}")
-    #     conn, addr = s.accept()
-    #     app.update_text_area(f"Connected by {addr}")
-    #     with conn:
-    #         while True:
-    #             data = conn.recv(1024)
-    #             if not data:
-    #                 break
-    #             
+    # Clear the current frame
+    if current_frame is not None:
+        current_frame.destroy()
 
-# client functionality
-class FileTransferApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("File Transfer")
-        self.label = tk.Label(root, text="Select a file to send:")
-        self.label.pack(pady=10)
+    clear_output()
 
-        self.browse_button = tk.Button(root, text="Browse", command=self.browse_file)
-        self.browse_button.pack(pady=5)
+    # Create main menu frame
+    current_frame = tk.Frame(root, bg="white", padx=10, pady=10)
+    current_frame.pack(expand=True, fill="both")
 
-        self.send_button = tk.Button(root, text="Send", command=self.send_file)
-        self.send_button.pack(pady=5)
+    sender_frame = tk.Frame(current_frame, bg="white", padx=10, pady=10)
+    sender_frame.pack(side=tk.LEFT, expand=True)
 
-        self.file_path = ""
+    receiver_frame = tk.Frame(current_frame, bg="white", padx=10, pady=10)
+    receiver_frame.pack(side=tk.RIGHT, expand=True)
 
-    def browse_file(self):
-        self.file_path = filedialog.askopenfilename()
-        if self.file_path:
-            self.label.config(text=f"Selected file: {self.file_path}")
+    # Load images
+    sender_image = load_image("./src/sendLogo.png", (150, 150))
+    receiver_image = load_image("./src/receiveLogo.png", (150, 150))
 
-    def send_file(self):
-        if not self.file_path:
-            messagebox.showerror("Error", "No file selected!")
-            return
+    # Add sender image and text
+    sender_label = tk.Label(sender_frame, image=sender_image, bg="white")
+    sender_label.image = sender_image
+    sender_label.pack()
+    sender_label.bind("<Button-1>", lambda e: show_sender_view())
+    sender_text = tk.Label(sender_frame, text="Sender", font=("Arial", 16, "bold"), bg="lightgray")
+    sender_text.pack()
 
-        attempt = 0
-        while attempt < 5:  
-            # try:
-            with open(self.file_path, 'rb') as f:
-                data = f.read(40)  
-                while data:
-                    SendFrame(data)
-                    data = f.read(40)
-            #     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            #         s.connect(('127.0.0.1', 12345))
+    # Add receiver image and text
+    receiver_label = tk.Label(receiver_frame, image=receiver_image, bg="white")
+    receiver_label.image = receiver_image
+    receiver_label.pack()
+    receiver_label.bind("<Button-1>", lambda e: show_receiver_view())
+    receiver_text = tk.Label(receiver_frame, text="Receiver", font=("Arial", 16, "bold"), bg="lightgray")
+    receiver_text.pack()
 
-            #         messagebox.showinfo("Success", "File sent successfully!")
-            #     return  
-            # except ConnectionRefusedError as e:
-            #     messagebox.showwarning("Warning", f"Attempt {attempt + 1}: Connection refused. Retrying...")
-            #     attempt += 1
-            #     time.sleep(1)  
-            # except Exception as e:
-            #     messagebox.showerror("Error", f"An error occurred: {e}")
-            #     return
+def show_receiver_view():
+    """Switch to the receiver view."""
+    global current_frame
+    custom_print("[main.py] Switching to Receiver", output_text=output_text)
 
-        messagebox.showerror("Error", "Failed to send file after multiple attempts.")
+    if current_frame is not None:
+        current_frame.destroy()
 
-def run_server(app):
-    start_server(app)
+    current_frame = tk.Frame(root, bg="white", padx=10, pady=10)
+    current_frame.pack(expand=True, fill="both")
 
-if __name__ == "__main__":
-    # create a Tkinter root for the receiver
-    receiver_root = tk.Tk()
-    receiver_app = FileReceiverApp(receiver_root)
+    back_button = tk.Button(current_frame, text="<-- Back", command=show_main_menu)
+    back_button.pack(pady=10)
 
-    # start the server in a separate thread with the receiver app
-    server_thread = threading.Thread(target=run_server, args=(receiver_app,), daemon=True)
-    server_thread.start()
+    Recv(current_frame, output_text) 
 
-    # give the server a moment to start
-    time.sleep(2) 
+def show_sender_view():
+    """Switch to the sender view."""
+    global current_frame
+    custom_print("[main.py] Switching to Sender", output_text=output_text)
 
-    # create a separate Tkinter root for the sender
-    sender_root = tk.Tk()
-    sender_app = FileTransferApp(sender_root)
+    if current_frame is not None:
+        current_frame.destroy()
 
-    # start the sender GUI
-    sender_root.mainloop()
+    current_frame = tk.Frame(root, bg="white", padx=10, pady=10)
+    current_frame.pack(expand=True, fill="both")
+
+    back_button = tk.Button(current_frame, text="<-- Back", command=show_main_menu)
+    back_button.pack(pady=10)
+
+    Send(current_frame, output_text) 
+
+# Initialize Tkinter window
+root = tk.Tk()
+root.title("File Transfer GUI")
+root.geometry("600x400")
+
+current_frame = None
+output_text = tk.Text(root, state="disabled", height=5)
+output_text.pack(side=tk.BOTTOM, fill=tk.X)
+
+show_main_menu()
+root.mainloop()
