@@ -2,36 +2,36 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from RecvTest import Recv
 from SendTest import Send
-from LogSetup import  SetupLogger
+from LogSetup import SetupLogger
 import logging
 from GuiHelpers import GuiHandler
 
 logger = SetupLogger("[main.py]", logging.DEBUG)
 
+# load and resize an image
 def load_image(path, size):
-    """Load and resize an image."""
     image = Image.open(path)
     image = image.resize(size, Image.Resampling.LANCZOS)
     return ImageTk.PhotoImage(image)
 
+# clear the output text box
 def clear_output():
-    """Clear the output text box."""
     global output_text
     output_text.configure(state="normal")
     output_text.delete("1.0", tk.END)
     output_text.configure(state="disabled")
 
+# display the main menu
 def show_main_menu():
-    """Display the main menu."""
     global current_frame
 
-    # Clear the current frame
+    # clear the current frame
     if current_frame is not None:
         current_frame.destroy()
 
     clear_output()
 
-    # Create main menu frame
+    # create main menu frame
     current_frame = tk.Frame(root, bg="white", padx=10, pady=10)
     current_frame.pack(expand=True, fill="both")
 
@@ -41,11 +41,11 @@ def show_main_menu():
     receiver_frame = tk.Frame(current_frame, bg="white", padx=10, pady=10)
     receiver_frame.pack(side=tk.RIGHT, expand=True)
 
-    # Load images
+    # load images
     sender_image = load_image("./src/sendLogo.png", (150, 150))
     receiver_image = load_image("./src/receiveLogo.png", (150, 150))
 
-    # Add sender image and text
+    # add sender image and text
     sender_label = tk.Label(sender_frame, image=sender_image, bg="white")
     sender_label.image = sender_image
     sender_label.pack()
@@ -53,7 +53,7 @@ def show_main_menu():
     sender_text = tk.Label(sender_frame, text="Sender", font=("Arial", 16, "bold"), bg="lightgray")
     sender_text.pack()
 
-    # Add receiver image and text
+    # add receiver image and text
     receiver_label = tk.Label(receiver_frame, image=receiver_image, bg="white")
     receiver_label.image = receiver_image
     receiver_label.pack()
@@ -61,8 +61,8 @@ def show_main_menu():
     receiver_text = tk.Label(receiver_frame, text="Receiver", font=("Arial", 16, "bold"), bg="lightgray")
     receiver_text.pack()
 
+# switch to the receiver view
 def show_receiver_view():
-    """Switch to the receiver view."""
     global current_frame
     logger.info("Switching to Receiver")
 
@@ -72,13 +72,18 @@ def show_receiver_view():
     current_frame = tk.Frame(root, bg="white", padx=10, pady=10)
     current_frame.pack(expand=True, fill="both")
 
-    back_button = tk.Button(current_frame, text="<-- Back", command=show_main_menu)
-    back_button.pack(pady=10)
+    back_button = tk.Button(
+        current_frame, 
+        text="<-- Back", 
+        command=show_main_menu,
+        bg="orange",
+        font=("Arial", 14, "bold")
+    ).pack(pady=20)
 
-    Recv(current_frame, output_text) 
+    Recv(current_frame, output_text)
 
+# switch to the sender view
 def show_sender_view():
-    """Switch to the sender view."""
     global current_frame
     logger.info("Switching to Sender")
 
@@ -88,21 +93,27 @@ def show_sender_view():
     current_frame = tk.Frame(root, bg="white", padx=10, pady=10)
     current_frame.pack(expand=True, fill="both")
 
-    back_button = tk.Button(current_frame, text="<-- Back", command=show_main_menu)
-    back_button.pack(pady=10)
+    back_button = tk.Button(
+        current_frame, 
+        text="<-- Back", 
+        command=show_main_menu,
+        bg="orange",
+        font=("Arial", 14, "bold")
+    ).pack(pady=20)
+
 
     Send(current_frame, output_text) 
 
-# Initialize Tkinter window
+
+# initialize Tkinter window
 root = tk.Tk()
 root.title("File Transfer GUI")
-root.geometry("600x400")
+root.geometry("900x600")
 
 current_frame = None
-output_text = tk.Text(root, state="disabled", height=5)
+output_text = tk.Text(root, state="disabled", height=15)
 output_text.pack(side=tk.BOTTOM, fill=tk.X)
 
-# this sets all logs to go through the handler function
 logging.getLogger().addHandler(GuiHandler(output_text))
 logging.getLogger().setLevel(logging.INFO)
 show_main_menu()

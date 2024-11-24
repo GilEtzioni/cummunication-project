@@ -4,6 +4,8 @@ from tkinter import filedialog
 from App.ApplicationLayerFunctions import TransferFile
 from LogSetup import SetupLogger
 import logging
+from AudioTransport.PhysicalLayer.tools.GraphSend import create_graph, change_graph
+
 logger = SetupLogger("[SendTest]", logging.DEBUG)  
 # TODO move prints to work with logger
 
@@ -11,6 +13,10 @@ selected_file_path = None
 
 def Send(sender_frame, output_text): 
     global selected_file_path  
+
+    graph_holder = {} # use a dictionary to hold the graph label reference
+    graph_holder['graph_label'] = create_graph(sender_frame) # create graph
+
     logger.info(f"Preparing to send file: {selected_file_path}")
     # open a file dialog to select a file to send
     def open_file_dialog():
@@ -22,22 +28,29 @@ def Send(sender_frame, output_text):
         )
         if file_path:
             selected_file_path = file_path
-            print(f"[SendTest.py] File selected: {file_path}")
+            logger.info(f"[SendTest.py] File selected: {file_path}")
         else:
-            print("[SendTest.py] No file selected.")
+            logger.info("[SendTest.py] No file selected.")
 
     # send the selected file
     def send_file():
         if not selected_file_path:
-            print("[SendTest.py] No file selected.")
+            logger.info("[SendTest.py] No file selected.")
             return
 
         try:
-            print(f"[SendTest.py] Preparing to send file: {selected_file_path}")
+            logger.info(f"[SendTest.py] Preparing to send file: {selected_file_path}")
+            """
             TransferFile(selected_file_path)
-            print(f"[SendTest.py] File sent successfully. Sent file: {selected_file_path}")
+            """
+            logger.info(f"[SendTest.py] File sent successfully. Sent file: {selected_file_path}")
+
+            # update the graph
+            logger.debug("[RecvTest.py] Updating the graph...")
+            graph_holder['graph_label'].destroy()                       # remove the old graph
+            graph_holder['graph_label'] = change_graph(sender_frame)  # display the new graph
         except Exception as e:
-            print(f"[SendTest.py] Error sending file: {e}")
+            logger.error(f"[SendTest.py] Error sending file: {e}")
 
     tk.Button(
         sender_frame,
@@ -54,4 +67,3 @@ def Send(sender_frame, output_text):
         bg="orange",
         font=("Arial", 14, "bold")
     ).pack(pady=20)
-
