@@ -11,7 +11,7 @@ logger = LogSetup.SetupLogger("ApplicationLayer")
 
 # reads the file using the transport layer
 def TransferFile(filepath: str):
-    logger.info(f"Preparing to send file: {filepath}")
+    logger.debug(f"Preparing to send file: {filepath}")
 
     if not os.path.exists(filepath):  # e.g. /Users/Desktop/FileOverSound/src/example.txt
         logger.error(f"File '{filepath}' does not exist.")

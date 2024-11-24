@@ -6,11 +6,11 @@ import numpy as np
 import logging
 import LogSetup
 
-logger = LogSetup.SetupLogger("Receiver", logging.DEBUG)
+logger = LogSetup.SetupLogger("RawReceiver", logging.DEBUG)
 # fftsize calcInterval maxFrameSize
 maxFrameSize = 41+5
 fftsize = int(conf.RecvSampleRate*conf.RecvBlockSizeMs//1000)
-calcIntervalMs= 1
+calcIntervalMs= 0.05
 samplesPerByte = conf.SendDataBlocks*conf.RecvBlockSizeMs//calcIntervalMs
 samplesToHold = maxFrameSize*samplesPerByte
 calcIntervalSamples = int(conf.RecvSampleRate*calcIntervalMs//1000)
@@ -160,7 +160,7 @@ class AudioReceiver:
         self.sampleSigs = []
         self.sampleVals = []
         self.waitAtEnd = 100
-        logger.info("Receiving frame")
+        logger.debug("Receiving frame")
         blocksLeftToTimeout = timeout*1000/calcIntervalMs
         self.stream =  sd.InputStream(channels=1,samplerate=conf.RecvSampleRate,blocksize=int(calcIntervalSamples))
         self.stream.start()
@@ -171,7 +171,7 @@ class AudioReceiver:
             blocksLeftToTimeout-=1
             data,missedSamples = self.stream.read(calcIntervalSamples)
             if missedSamples:
-                logger.warning(f"missed samples when receiving audio maybe try reducing processing time")
+                logger.debug(f"missed samples when receiving audio maybe try reducing processing time")
             self.processAudioSample(data[:,0])
         self.stream.stop()
         logger.info(f"received: {self.received} len{len(self.received)} snr: {self.snr}")

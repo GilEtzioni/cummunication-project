@@ -9,8 +9,7 @@ logger = LogSetup.SetupLogger("TransportLayer")
 
 # send the file
 def SendFile(filepath, filelen, filename):
-    logger.info("in SendFile")
-    logger.info(f"File details: Name='{filename}', Length={filelen} bytes, filepath={filepath}")
+    logger.debug(f"File details: Name='{filename}', Length={filelen} bytes, filepath={filepath}")
 
     # ----- sender header -----
     # e.g:  b'\x00\x00\x00\x0bexample.txt\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00x'
@@ -56,7 +55,7 @@ def SendFile(filepath, filelen, filename):
 
 # get a file header and its content, then writes the file to the output directory 
 def ReceiveFile(output_dir: str) -> str:
-    logger.info("in ReceiveFile")
+    logger.debug("in ReceiveFile")
     nextFrameNumber = 0
     try:
         header_bytes = RecvFrame(nextFrameNumber)
@@ -102,7 +101,7 @@ def ReceiveFile(output_dir: str) -> str:
 # converts the header dictionary into a byte array
 # ensures the header (filename length, filename, and file length) can be sent in 0/1 over the network
 def CreateHeader(header: dict) -> bytes:
-    logger.info("in CreateHeader")
+    logger.debug("in CreateHeader")
 
     try:
         filename = header["FileName"].encode('utf-8')  # convert the string to bytes
@@ -127,7 +126,7 @@ def CreateHeader(header: dict) -> bytes:
 def UnpackHeader(header_bytes: bytes) -> dict:
     try:
         
-        logger.info("in UnpackHeader")
+        logger.debug("in UnpackHeader")
         file_name_len = int.from_bytes(header_bytes[:4], 'big')         # first 4 bytes from the header     -> int
         filename = header_bytes[4:36].rstrip(b'\0').decode('utf-8')     # next 32 bytes                     -> UTF-8 string
         file_len = int.from_bytes(header_bytes[36:], 'big')             # the remaining bytes (file length) -> int

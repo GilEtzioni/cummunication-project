@@ -11,12 +11,13 @@ logger = LogSetup.SetupLogger("[AudioTransport.py]", logging.DEBUG)
 
 def RecvFrame(expectedFrameNum) -> bytes:
     """Receive Frame and return it or None if invalid"""
-    logger.info(f"Receiving raw frame number {expectedFrameNum}")
+    if expectedFrameNum != 0:
+        logger.info(f"Receiving raw frame number {expectedFrameNum}")
     expectedFrameNum = expectedFrameNum%256
     while True:
         received,_ = RecvFrameRaw()
-        print (int(received[0]))
-        print (expectedFrameNum)
+        logger.debug(int(received[0]))
+        logger.debug(expectedFrameNum)
         if int(received[0]) == expectedFrameNum:
             break
         logger.warning(f"received frame {int(received[0])} twice")

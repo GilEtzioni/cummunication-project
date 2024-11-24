@@ -17,7 +17,7 @@ def Send(sender_frame, output_text):
     graph_holder = {} # use a dictionary to hold the graph label reference
     graph_holder['graph_label'] = create_graph(sender_frame) # create graph
 
-    logger.info(f"Preparing to send file: {selected_file_path}")
+    logger.debug(f"Preparing to send file: {selected_file_path}")
     # open a file dialog to select a file to send
     def open_file_dialog():
 
@@ -39,10 +39,8 @@ def Send(sender_frame, output_text):
             return
 
         try:
-            logger.info(f"[SendTest.py] Preparing to send file: {selected_file_path}")
-            """
+            logger.debug(f"[SendTest.py] Preparing to send file: {selected_file_path}")
             TransferFile(selected_file_path)
-            """
             logger.info(f"[SendTest.py] File sent successfully. Sent file: {selected_file_path}")
 
             # update the graph
