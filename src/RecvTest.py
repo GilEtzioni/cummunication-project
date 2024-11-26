@@ -1,23 +1,27 @@
 import os
 import tkinter as tk
+from tkinter import ttk
 from tkinter import filedialog
 from App.ApplicationLayerFunctions import ReceiveAndSaveFile
 from LogSetup import SetupLogger
 from AudioTransport.PhysicalLayer.tools.GraphRecv import create_graph, change_graph
 import logging
 import threading
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import INFO, SUCCESS
+from Style import create_ui
 
-
-logger = SetupLogger("[RecvTest.py]", logging.DEBUG)  
+logger = SetupLogger("[RecvTest.py]", logging.DEBUG)
 selected_folder = None
 
-def Recv(receiver_frame, output_text): 
+
+def Recv(receiver_frame, output_text):
     global selected_folder
 
-    graph_holder = {} # use a dictionary to hold the graph label reference
-    graph_holder['graph_label'] = create_graph(receiver_frame) # create graph
+    graph_holder = {}
+    graph_holder['graph_label'] = create_graph(receiver_frame)  # create graph --> maybe i will change the logic
 
-    # open a folder dialog to select a folder for saving files
+    # open a folder dialog --> select a folder for saving files
     def open_folder_dialog():
         global selected_folder
         folder_path = filedialog.askdirectory(title="Select a Folder to Save Files")
@@ -25,44 +29,32 @@ def Recv(receiver_frame, output_text):
             selected_folder = folder_path
             logger.info(f"Folder selected: {os.path.abspath(selected_folder)}")
         else:
-            logger.info("[No folder selected.")
+            logger.info("No folder selected.")
 
-    # start receiving and saving data
+    # start receiving data
     def receive_data():
         if not selected_folder:
             logger.info("Please select a folder before receiving data.")
             return
 
         try:
-            logger.info(f"Starting data reception to folder: {selected_folder}")
-
-            # ReceiveAndSaveFile(selected_folder)
             thread = threading.Thread(target=ReceiveAndSaveFile, args=(selected_folder,))
             thread.daemon = True
             thread.start()
 
-            # update the graph
-            logger.debug("Updating the graph...")
-            graph_holder['graph_label'].destroy()                       # remove the old graph
-            graph_holder['graph_label'] = change_graph(receiver_frame)  # display the new graph
-            logger.debug(f"File saved successfully to {selected_folder}")
+            graph_holder['graph_label'].destroy()
+            graph_holder['graph_label'] = change_graph(receiver_frame)
         except Exception as e:
             logger.error(f"Error during file reception: {e}")
 
-    # folder selection button
-    tk.Button(
+    # use UI
+    create_ui(
         receiver_frame,
-        text="Select Folder to Save Files",
-        command=open_folder_dialog,
-        bg="lightblue",
-        font=("Arial", 14, "bold")
-    ).pack(pady=20)
-
-    # start listening button
-    tk.Button(
-        receiver_frame,
-        text="Start Listening",
-        command=receive_data,
-        bg="lightgreen",
-        font=("Arial", 14, "bold")
-    ).pack(pady=20)
+        first_button_action=open_folder_dialog,
+        second_button_action=receive_data,
+        first_butt_name="Select Folder to Save Files",
+        second_butt_name="Start Listening",
+        slider_name1="Block Size",
+        slider_name2="Calc Interval",
+        slider_name3="?????"
+    )

@@ -5,22 +5,22 @@ from App.ApplicationLayerFunctions import TransferFile
 from LogSetup import SetupLogger
 import logging
 from AudioTransport.PhysicalLayer.tools.GraphSend import create_graph, change_graph
+import threading
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import INFO, SUCCESS
+from Style import create_ui
 
-logger = SetupLogger("[SendTest]", logging.DEBUG)  
-# TODO move prints to work with logger
+logger = SetupLogger("[SendTest]", logging.DEBUG)
+selected_file_path = None
 
-selected_file_path = None 
+def Send(sender_frame, output_text):
+    global selected_file_path
 
-def Send(sender_frame, output_text): 
-    global selected_file_path  
+    graph_holder = {}  # Use a dictionary to hold the graph label reference
+    graph_holder['graph_label'] = create_graph(sender_frame)  # create graph --> maybe i will change the logic
 
-    graph_holder = {} # use a dictionary to hold the graph label reference
-    graph_holder['graph_label'] = create_graph(sender_frame) # create graph
-
-    logger.debug(f"Preparing to send file: {selected_file_path}")
-    # open a file dialog to select a file to send
+    # open a file dialog --> select a file to send
     def open_file_dialog():
-
         global selected_file_path
         file_path = filedialog.askopenfilename(
             title="Select a File to Send",
@@ -39,29 +39,25 @@ def Send(sender_frame, output_text):
             return
 
         try:
-            logger.debug(f"[SendTest.py] Preparing to send file: {selected_file_path}")
-            TransferFile(selected_file_path)
-            logger.info(f"[SendTest.py] File sent successfully. Sent file: {selected_file_path}")
+            thread = threading.Thread(target=TransferFile, args=(selected_file_path,))
+            thread.daemon = True
+            thread.start()
+            logger.info(f"[SendTest.py] File sent successfully: {selected_file_path}")
 
-            # update the graph
-            logger.debug("[RecvTest.py] Updating the graph...")
-            graph_holder['graph_label'].destroy()                       # remove the old graph
-            graph_holder['graph_label'] = change_graph(sender_frame)  # display the new graph
+            # update the graph after the user start listening
+            graph_holder['graph_label'].destroy()
+            graph_holder['graph_label'] = change_graph(sender_frame)
         except Exception as e:
             logger.error(f"[SendTest.py] Error sending file: {e}")
 
-    tk.Button(
+    # use UI
+    create_ui(
         sender_frame,
-        text="Select File To Send",
-        command=open_file_dialog,
-        bg="lightgreen",
-        font=("Arial", 14, "bold")
-    ).pack(pady=20)
-
-    tk.Button(
-        sender_frame,
-        text="Send",
-        command=send_file,
-        bg="orange",
-        font=("Arial", 14, "bold")
-    ).pack(pady=20)
+        first_button_action=open_file_dialog,
+        second_button_action=send_file,
+        first_butt_name="Select File to Send",
+        second_butt_name="Send",
+        slider_name1="Voulme",
+        slider_name2="Frequency",
+        slider_name3="Block Size"
+    )

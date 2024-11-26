@@ -3,6 +3,8 @@ from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 import numpy as np
 import io
+import threading
+
 
 def change_graph(parent_frame):
     # generate updated data
@@ -22,7 +24,7 @@ def _update_graph(parent_frame, x, y, title, moving=False):
         y[-1] = np.sin(np.pi * (np.random.rand()))  # Append a random value
 
         # create a new figure
-        fig, ax = plt.subplots(figsize=(2, 1.5))  # Width = 2 inches, Height = 1.5 inches
+        fig, ax = plt.subplots(figsize=(4, 3))  # Width = 2 inches, Height = 1.5 inches
         ax.plot(x, y)
         ax.set_title(title, fontsize=8)
         ax.set_xlabel("X-axis", fontsize=6)
@@ -47,7 +49,7 @@ def _update_graph(parent_frame, x, y, title, moving=False):
             parent_frame.after(500, animate)  # update every 500ms
 
     # initialize the graph
-    fig, ax = plt.subplots(figsize=(2, 1.5))
+    fig, ax = plt.subplots(figsize=(4, 3))
     if len(x) > 0 and len(y) > 0:
         ax.plot(x, y)
     ax.set_title(title, fontsize=8)
@@ -65,7 +67,8 @@ def _update_graph(parent_frame, x, y, title, moving=False):
 
     graph_label = tk.Label(parent_frame, image=img, bg="white")
     graph_label.image = img
-    graph_label.place(relx=0.5, rely=1.0, anchor="s")
+    graph_label.place(relx=1.0, rely=0.5, anchor="e", x=-8, y=20)
+
 
     # start the animation if moving is enabled
     if moving:
