@@ -25,8 +25,8 @@
      
         // "-v"
     ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": false,
     "editor.tokenColorCustomizations": {
         "[*Light*]": {
             "textMateRules": [
@@ -68,5 +68,12 @@
                 }
             }
         ]
-    }
+    },
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./tests",
+        "-p",
+        "test_*.py"
+    ]
 }

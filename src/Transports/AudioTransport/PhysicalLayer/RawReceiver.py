@@ -10,7 +10,7 @@ logger = LogSetup.SetupLogger("RawReceiver", logging.DEBUG)
 # fftsize calcInterval maxFrameSize
 maxFrameSize = 41+5
 fftsize = int(conf.RecvSampleRate*conf.RecvBlockSizeMs//1000)
-calcIntervalMs= 0.05
+calcIntervalMs= 5
 samplesPerByte = conf.SendDataBlocks*conf.RecvBlockSizeMs//calcIntervalMs
 samplesToHold = maxFrameSize*samplesPerByte
 calcIntervalSamples = int(conf.RecvSampleRate*calcIntervalMs//1000)

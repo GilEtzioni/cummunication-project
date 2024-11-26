@@ -5,6 +5,8 @@ from App.ApplicationLayerFunctions import ReceiveAndSaveFile
 from LogSetup import SetupLogger
 from AudioTransport.PhysicalLayer.tools.GraphRecv import create_graph, change_graph
 import logging
+import threading
+
 
 logger = SetupLogger("[RecvTest.py]", logging.DEBUG)  
 selected_folder = None
@@ -33,17 +35,17 @@ def Recv(receiver_frame, output_text):
 
         try:
             logger.info(f"Starting data reception to folder: {selected_folder}")
-            ReceiveAndSaveFile(selected_folder)
 
-            """
-            ReceiveAndSaveFile(selected_folder)
-            """
+            # ReceiveAndSaveFile(selected_folder)
+            thread = threading.Thread(target=ReceiveAndSaveFile, args=(selected_folder,))
+            thread.daemon = True
+            thread.start()
 
             # update the graph
             logger.debug("Updating the graph...")
             graph_holder['graph_label'].destroy()                       # remove the old graph
             graph_holder['graph_label'] = change_graph(receiver_frame)  # display the new graph
-            logger.info(f"File saved successfully to {selected_folder}")
+            logger.debug(f"File saved successfully to {selected_folder}")
         except Exception as e:
             logger.error(f"Error during file reception: {e}")
 
