@@ -5,42 +5,9 @@ import sounddevice as sd
 import numpy as np
 import logging
 import LogSetup
+from AudioTransport.AudioConfig import Config   
 
 logger = LogSetup.SetupLogger("RawReceiver", logging.DEBUG)
-# fftsize calcInterval maxFrameSize
-maxFrameSize = 41+5
-fftsize = int(conf.RecvSampleRate*conf.RecvBlockSizeMs//1000)
-calcIntervalMs= 5
-samplesPerByte = conf.SendDataBlocks*conf.RecvBlockSizeMs//calcIntervalMs
-samplesToHold = maxFrameSize*samplesPerByte
-calcIntervalSamples = int(conf.RecvSampleRate*calcIntervalMs//1000)
-
-low, high = conf.StartFrequency,conf.MaxFrequency
-allFreqs = np.fft.rfftfreq(fftsize,1/conf.RecvSampleRate )
-lowFreqIndex = np.searchsorted(allFreqs, low)
-
-
-def fftChunk(data): 
-    
-
-    # print (allFreqs)
-    # exit(1)
-    return np.abs(np.fft.rfft(data,n=len(data)))
-
-
-
-def processChunk(chunkData):
-    fft = fftChunk(chunkData)[lowFreqIndex: lowFreqIndex+conf.FrequencySteps]
-    value = int(np.argmax(fft))
-    # print(value)
-    matchLevel = np.max(fft)
-    noise = np.sum(fft)-matchLevel
-    return value,matchLevel,noise
-
-
-
-    
-    
 
 def calcChecksum(samples):
     chk =0
@@ -64,33 +31,23 @@ def tryGetValidFrame(srcData):
     if chksum == recvChkSum: 
         return srcData[-5-dataLen:-5]
 
+
+
 def findFrame(sampleVals,sampleSigs,sampleNoises): 
-    # Get the relevant samples to check
-    step = conf.SendDataBlocks*conf.RecvBlockSizeMs //calcIntervalMs
-    if len(sampleVals)<5*step:
-        return None,0
-    relevantVals = (sampleVals[::-step])[::-1]
-    relevantSigs = (sampleSigs[::-step])[::-1]
-    relevantNoises = (sampleNoises[::-step])[::-1]
-  
-    validFrame =tryGetValidFrame(relevantVals)
-    
-    totalNoise = int(sum(relevantNoises))+0.1
-    totalSignal =  int(sum(relevantSigs))
-# # For printing out the samples for debug purposes
-#     for sample in relevantVals:
-#         # if sample.noise==0:
-#         print(sample,end=" ")
-#     print(f"snr: {totalSignal/totalNoise}")
-  
-    # print (f"chksum {chksum} last {relevantSamples[-1]}")
-    # we can save processing time if we have a start sequence maybe a smaller checksum
-    # Last 5 bytes are the checksum and the length of the data
+    validFrame =tryGetValidFrame(sampleVals)
+# For printing out the samples for debug purposes
+
+    # totalNoise = int(sum(sampleNoises))+0.1
+    # totalSignal =  int(sum(sampleNoises))
+    # for sample in sampleVals:
+    #     # if sample.noise==0:
+    #     print(sample,end=" ")
+    # print(f"snr: {totalSignal/totalNoise}")
     totalNoise = 0
     totalSignal = 0
     if validFrame:
-        totalNoise = relevantNoises[-5-len(validFrame)]
-        totalSignal =relevantSigs[-5-len(validFrame)]
+        totalNoise = sampleNoises[-5-len(validFrame)]
+        totalSignal =sampleSigs[-5-len(validFrame)]
         # int(sum(relevantSigs[-5-len(validFrame)]))
         if totalNoise == 0:
             snr= 1000000
@@ -100,47 +57,71 @@ def findFrame(sampleVals,sampleSigs,sampleNoises):
         return bytes(validFrame),snr
     return None,0
 
-        
+
 
 
 
 ret= None
 class AudioReceiver:
     # todo add configs here
-    def __init__(self):
+    def __init__(self,conf:Config):
         self.received = None
-        self.fullData= np.zeros(fftsize*maxFrameSize)
+
         self.sampleVals = []
         self.sampleSigs = []
         self.sampleNoises = []
         self.complete = False
-        self.waitAtEnd = samplesToHold
+        self.sampleRate = conf.sampleRate
+        self.maxRawFrameSize = conf.maxFrameSize+6
+        self.fftsize = int((conf.sampleRate*conf.msPerFFT)//1000)
+        self.calcIntervalMs = conf.calcIntervalMs
+        self.calcIntervalSamples = int(conf.sampleRate*conf.calcIntervalMs//1000)
+        self.samplesPerByte =1000//(conf.speedBPS*self.calcIntervalMs)        
+        self.fullData= np.zeros(self.fftsize)
+        self.samplesToHold = self.maxRawFrameSize*self.samplesPerByte
+        self.waitAtEnd = self.samplesToHold
         self.snr = 0
-    # def audio_callback(self,indata, frames, timer, status):
-    #     """This is called (from a separate thread) for each audio block."""
-    #     assert len(indata) ==calcIntervalSamples
-    #     if status:
-    #         logger.error(status, file=sys.stderr)
-    #     self.processAudioSample(indata[:,0])
+        self.step =self.samplesPerByte
+        allFreqs = np.fft.rfftfreq(self.fftsize,1/conf.sampleRate )
+        self.lowFreqIndex = np.searchsorted(allFreqs, conf.freq)
+        print(f"lowFreqIndex {self.lowFreqIndex} allFreqs {allFreqs[self.lowFreqIndex]}")
+        # self.usedFreqs= availableFreqs[availableFreqs>=conf.StartFrequency][:conf.FrequencySteps]
+        
+    
+    def fftChunk(self,data): 
+        return np.abs(np.fft.rfft(data,n=len(data)))
+
+    def processChunk(self,chunkData):
+        fft = self.fftChunk(chunkData)[self.lowFreqIndex: self.lowFreqIndex+256]
+        value = int(np.argmax(fft))
+        # print(value)
+        matchLevel = np.max(fft)
+        noise = np.sum(fft)-matchLevel
+        return value,matchLevel,noise
+
     def processAudioSample(self,data):
         shift = len(data)
         self.fullData = np.roll(self.fullData, -shift)
         self.fullData[-shift:] = data
-        val,sig,noise = processChunk(self.fullData[-fftsize:])
+        val,sig,noise = self.processChunk(self.fullData[-self.fftsize:])
         self.sampleVals.append(val)
         self.sampleSigs.append(sig)
         self.sampleNoises.append(noise)
-        if len(self.sampleVals)>samplesToHold:
+        if len(self.sampleVals)>self.samplesToHold:
             self.sampleVals.pop(0)
             self.sampleSigs.pop(0)
             self.sampleNoises.pop(0)
 
-        received,snr = findFrame(self.sampleVals,self.sampleSigs,self.sampleNoises)
+
+        if len(self.sampleVals)<5*self.step:
+            return None,0
+        
+        received,snr = findFrame((self.sampleVals[::-self.step])[::-1],(self.sampleSigs[::-self.step])[::-1],(self.sampleNoises[::-self.step])[::-1])
         # check more samples to get a good snr reading
         if not received and not self.received:
             return
         if  not self.received:
-            self.waitAtEnd = samplesPerByte
+            self.waitAtEnd = self.samplesPerByte
             self.received = received
             self.snr = snr
             return
@@ -151,7 +132,7 @@ class AudioReceiver:
         
         self.complete = True
             
-    def recvFrameBlocking(self,timeout=0):
+    def recvFrameBlocking(self,timeout:int):
         # TODO add error handling and confgurations
         self.received = None
         self.complete = False
@@ -161,15 +142,15 @@ class AudioReceiver:
         self.sampleVals = []
         self.waitAtEnd = 100
         logger.debug("Receiving frame")
-        blocksLeftToTimeout = timeout*1000/calcIntervalMs
-        self.stream =  sd.InputStream(channels=1,samplerate=conf.RecvSampleRate,blocksize=int(calcIntervalSamples))
+        blocksLeftToTimeout = timeout*1000/self.calcIntervalMs
+        self.stream =  sd.InputStream(channels=1,samplerate=self.sampleRate,blocksize=int(self.calcIntervalSamples))
         self.stream.start()
         while not self.complete:
             if timeout !=0 and blocksLeftToTimeout<0:
                 logger.warning("Timeout receiving audio")
                 raise TimeoutError
             blocksLeftToTimeout-=1
-            data,missedSamples = self.stream.read(calcIntervalSamples)
+            data,missedSamples = self.stream.read(self.calcIntervalSamples)
             if missedSamples:
                 logger.debug(f"missed samples when receiving audio maybe try reducing processing time")
             self.processAudioSample(data[:,0])
@@ -178,10 +159,11 @@ class AudioReceiver:
     
         return self.received, self.snr
     
-def RecvFrameRaw(timeout = 0):
+def RecvFrameRaw(config = Config(),timeout = 0):
     global ret
+    
     # TODO add configuration when creating AudioReceiver
-    audio_receiver = AudioReceiver()    
+    audio_receiver = AudioReceiver(config)    
     return audio_receiver.recvFrameBlocking(timeout)
 
 

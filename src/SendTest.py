@@ -5,6 +5,7 @@ from App.ApplicationLayerFunctions import TransferFile
 from LogSetup import SetupLogger
 import logging
 from AudioTransport.PhysicalLayer.tools.GraphSend import create_graph, change_graph
+from AudioTransport.AudioConfig import Config  
 import threading
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import INFO, SUCCESS
@@ -13,7 +14,7 @@ from Style import create_ui
 logger = SetupLogger("[SendTest]", logging.DEBUG)
 selected_file_path = None
 
-def Send(sender_frame, output_text):
+def Send(sender_frame,config:Config):
     global selected_file_path
 
     graph_holder = {}  # Use a dictionary to hold the graph label reference
@@ -39,7 +40,7 @@ def Send(sender_frame, output_text):
             return
 
         try:
-            thread = threading.Thread(target=TransferFile, args=(selected_file_path,))
+            thread = threading.Thread(target=TransferFile, args=(selected_file_path,config))
             thread.daemon = True
             thread.start()
             logger.info(f"[SendTest.py] File sent successfully: {selected_file_path}")

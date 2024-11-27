@@ -13,3 +13,6 @@ def test_SendRecvLoud():
         value, snr = future.result()
         assert value == data
         assert snr > 0
+if __name__ == "__main__":
+    test_SendRecvLoud()
+    print("All tests passed")

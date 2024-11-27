@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 from App.ApplicationLayerFunctions import ReceiveAndSaveFile
+from AudioTransport.AudioConfig import Config  
+import os
 from LogSetup import SetupLogger
 from AudioTransport.PhysicalLayer.tools.GraphRecv import create_graph, change_graph
 import logging
@@ -15,7 +17,7 @@ logger = SetupLogger("[RecvTest.py]", logging.DEBUG)
 selected_folder = None
 
 
-def Recv(receiver_frame, output_text):
+def Recv(receiver_frame, config:Config):
     global selected_folder
 
     graph_holder = {}
@@ -38,7 +40,7 @@ def Recv(receiver_frame, output_text):
             return
 
         try:
-            thread = threading.Thread(target=ReceiveAndSaveFile, args=(selected_folder,))
+            thread = threading.Thread(target=ReceiveAndSaveFile, args=(selected_folder,config,))
             thread.daemon = True
             thread.start()
 

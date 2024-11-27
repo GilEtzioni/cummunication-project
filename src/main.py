@@ -3,7 +3,8 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 from RecvTest import Recv
 from SendTest import Send
-from LogSetup import SetupLogger
+from LogSetup import  SetupLogger
+from AudioTransport.AudioConfig import Config  
 import logging
 from GuiHelpers import GuiHandler
 # import ttkbootstrap as ttk
@@ -100,7 +101,7 @@ def show_receiver_view():
     )
     back_button.pack(pady=10, anchor="w", side="top")
 
-    Recv(current_frame, output_text)
+    Recv(current_frame, Config()) 
 
 # switch to the sender view
 def show_sender_view():
@@ -121,9 +122,9 @@ def show_sender_view():
     )
     back_button.pack(pady=10, anchor="w", side="top")
 
-    Send(current_frame, output_text)
+    Send(current_frame, Config(volume = 0.2))
 
-# initialize Tkinter window
+# Initialize Tkinter window
 root = tk.Tk()
 root.title("File Transfer GUI")
 root.geometry("800x770")

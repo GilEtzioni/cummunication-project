@@ -1,4 +1,5 @@
 from Transports.AudioTransport.DataLayer.AudioTransport import SendFrame,RecvFrame
+from AudioTransport.AudioConfig import Config  
 import time
 import LogSetup
 
@@ -8,7 +9,7 @@ MAX_HEADER = 40
 logger = LogSetup.SetupLogger("TransportLayer")
 
 # send the file
-def SendFile(filepath, filelen, filename):
+def SendFile(filepath, filelen, filename,config:Config):
     logger.debug(f"File details: Name='{filename}', Length={filelen} bytes, filepath={filepath}")
 
     # ----- sender header -----
@@ -28,7 +29,7 @@ def SendFile(filepath, filelen, filename):
         header_bytes = CreateHeader(header)          # convert header to bytes
         logger.info(f"Sending header: {header}")
 
-        SendFrame(header_bytes,frameNumber)  # send the header
+        SendFrame(header_bytes,frameNumber,config)  # send the header
         frameNumber += 1
         # ----------------------------- without the delay .pdf will fail! -----------------------------
         time.sleep(0.02)
@@ -40,7 +41,7 @@ def SendFile(filepath, filelen, filename):
                 while chunk := f.read(CHUNK):
                     chunk_number += 1
                     logger.debug(f"Sending chunk {chunk_number}: {chunk}")
-                    SendFrame(chunk,frameNumber)
+                    SendFrame(chunk,frameNumber,config)
                     frameNumber += 1
                     time.sleep(0.005)  # delay between chunks (LESS THAN 0.005 WILL PROBABLY FAIL!!!)
         except Exception as e:
@@ -54,11 +55,11 @@ def SendFile(filepath, filelen, filename):
 
 
 # get a file header and its content, then writes the file to the output directory 
-def ReceiveFile(output_dir: str) -> str:
+def ReceiveFile(output_dir: str,config: Config) -> str:
     logger.debug("in ReceiveFile")
     nextFrameNumber = 0
     try:
-        header_bytes = RecvFrame(nextFrameNumber)
+        header_bytes = RecvFrame(nextFrameNumber,config)
         nextFrameNumber += 1
 
         if len(header_bytes) != MAX_HEADER:
@@ -78,7 +79,7 @@ def ReceiveFile(output_dir: str) -> str:
                 received_len = 0
 
                 while received_len < filelen:
-                    chunk = RecvFrame(nextFrameNumber)
+                    chunk = RecvFrame(nextFrameNumber,config)
       
     
                     valid_chunk_size = min(filelen - received_len, len(chunk))

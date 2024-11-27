@@ -5,10 +5,11 @@
 
 #!/usr/bin/env python3
 """Play a sine signal."""
-import AudioTransport.PhysicalLayer.conf as conf
+
 import numpy as np
 # import matplotlib.pyplot as plt
 import sounddevice as sd
+from AudioTransport.AudioConfig import Config  
 import logging
 import LogSetup
 logger = LogSetup.SetupLogger("RawSender", logging.INFO)
@@ -16,30 +17,32 @@ logger = LogSetup.SetupLogger("RawSender", logging.INFO)
 
 
 class AudioEncoder:
-    def __init__(self):
+    def __init__(self,conf:Config = Config()):
         self.phase = 0
-        rfftSize= int(conf.RecvBlockSizeMs*(conf.RecvSampleRate / (1000)))
+        self.conf = conf
+        rfftSize= int(conf.msPerFFT*(conf.sampleRate / (1000)))
         # print(f"rfftSize {rfftSize}")
-        availableFreqs=np.fft.rfftfreq(rfftSize,1/conf.RecvSampleRate)
+        availableFreqs=np.fft.rfftfreq(rfftSize,1/conf.sampleRate)
         print(availableFreqs)
-        self.usedFreqs= availableFreqs[availableFreqs>=conf.StartFrequency][:conf.FrequencySteps]
-        if(np.max(self.usedFreqs)>conf.MaxFrequency or len(self.usedFreqs)<conf.FrequencySteps):
-            logger.error("Error: not enough frequencies")
+        self.usedFreqs= availableFreqs[availableFreqs>=conf.freq][:conf.freq]
+        # if(np.max(self.usedFreqs)>conf.MaxFrequency or len(self.usedFreqs)<conf.freq):
+        #     logger.error("Error: not enough frequencies")
 
 
         
     def encode(self,byte):
-        data = self.ByteToWaveformPhased(byte,conf.SendSampleRate)
+        data = self.ByteToWaveformPhased(byte)
         return data
     
-    def ByteToWaveformPhased(self,byte, sampleRate=conf.SendSampleRate, lengthMult=conf.SendDataBlocks):
+    def ByteToWaveformPhased(self,byte ):
+
         freq = self.usedFreqs[int(byte)]
         logger.debug(f"encoding {int(byte)} as {freq}")
-        samplesToSend = int((conf.RecvBlockSizeMs* sampleRate*lengthMult) / 1000)
+        samplesToSend = int((self.conf.sampleRate/self.conf.speedBPS) )
 
-        t = np.arange(samplesToSend) / sampleRate
-        phase_increment = 2 * np.pi * freq / sampleRate
-        data = conf.SendAmplitude * np.sin(2 * np.pi * freq * t + self.phase)
+        t = np.arange(samplesToSend) / self.conf.sampleRate
+        phase_increment = 2 * np.pi * freq / self.conf.sampleRate
+        data =self.conf.volume * np.sin(2 * np.pi * freq * t + self.phase)
         
         # Keep track of the phase so we dont have a jump in the waveform
         self.phase= (self.phase + phase_increment * samplesToSend) % (2 * np.pi)
@@ -58,21 +61,21 @@ def addFooter(data):
     logger.debug(f"Checksum: {chksum}")
     return data +chksum + bytes([len(data)]) +b'AA'   
 
-def GenerateWaveform(data):
-    encoder = AudioEncoder()
+def GenerateWaveform(data,config: Config):
+    encoder = AudioEncoder(config)
     waveForm = np.array([])
     for i in data:
         waveForm = np.append(waveForm,encoder.encode(i))
     return waveForm
 
-def SendFrameRaw(data):
+def SendFrameRaw(data,config: Config = Config()):    
     
     data = addFooter(data)
     logger.debug(data)
     # TODO add configuration when creating encoder
-    waveForm = GenerateWaveform(data)
+    waveForm = GenerateWaveform(data,config)
     logger.info("Playing waveform")
-    sd.play(waveForm,blocking=True,samplerate=conf.SendSampleRate)
+    sd.play(waveForm,blocking=True,samplerate=config.sampleRate)
     logger.debug("Waveform played")
 
 if __name__ == "__main__":

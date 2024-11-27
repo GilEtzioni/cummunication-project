@@ -1,4 +1,5 @@
 from App.TransportLayerFunctions import SendFile, ReceiveFile
+from AudioTransport.AudioConfig import Config  
 import os
 import LogSetup
 import sys
@@ -10,7 +11,7 @@ import sys
 logger = LogSetup.SetupLogger("ApplicationLayer")
 
 # reads the file using the transport layer
-def TransferFile(filepath: str):
+def TransferFile(filepath: str,config:Config):
     logger.debug(f"Preparing to send file: {filepath}")
 
     if not os.path.exists(filepath):  # e.g. /Users/Desktop/FileOverSound/src/example.txt
@@ -21,7 +22,7 @@ def TransferFile(filepath: str):
         filename = os.path.basename(filepath)  # e.g., example.txt
         filelen = os.path.getsize(filepath)    # e.g., 115
         logger.info(f"Starting SendFile from {filepath}")
-        SendFile(filepath, filelen, filename)
+        SendFile(filepath, filelen, filename,config)
         logger.info(f"File '{filepath}' sent successfully.")
 
     except Exception as e:
@@ -29,10 +30,10 @@ def TransferFile(filepath: str):
 
 
 # get a file and saves it to the specified directory
-def ReceiveAndSaveFile(output_dir: str):
+def ReceiveAndSaveFile(output_dir: str,config:Config) -> str:
     logger.info(f"Waiting to receive file...")
     try:
-        filename = ReceiveFile(output_dir)            # get filename from the header
+        filename = ReceiveFile(output_dir,config)            # get filename from the header
         filepath = os.path.join(output_dir, filename) # compute the full file path
         logger.info(f"File received and saved as '{filepath}'.")
         return filepath
@@ -42,18 +43,18 @@ def ReceiveAndSaveFile(output_dir: str):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.exit(1)
+    # if len(sys.argv) < 2:
+    #     sys.exit(1)
 
-    function_to_call = sys.argv[1]
+    # function_to_call = sys.argv[1]
 
-    if function_to_call == "TransferFile":
-        hardcoded_file_path = "/Users/giletzioni/Desktop/FileOverSound-gil/src/SendAndSaveFiles/SendFiles/example.txt"
-        TransferFile(hardcoded_file_path)
+    # if function_to_call == "TransferFile":
+    #     hardcoded_file_path = "/Users/giletzioni/Desktop/FileOverSound-gil/src/SendAndSaveFiles/SendFiles/example.txt"
+    #     TransferFile(hardcoded_file_path,Config())
 
-    elif function_to_call == "ReceiveAndSaveFile":
-        hardcoded_output_dir = "/Users/giletzioni/Desktop/FileOverSound-gil/src/SendAndSaveFiles/GetFiles"
-        ReceiveAndSaveFile(hardcoded_output_dir)
+    # elif function_to_call == "ReceiveAndSaveFile":
+    #     hardcoded_output_dir = "/Users/giletzioni/Desktop/FileOverSound-gil/src/SendAndSaveFiles/GetFiles"
+    ReceiveAndSaveFile("./files",Config())
 
-    else:
-        sys.exit(1)
+    # else:
+    #     sys.exit(1)
