@@ -14,10 +14,3 @@ RecvSampleRate = 41200.0
 
 RecvBlockSizeMs = 50
 RecvFrameSizeMs = 1
-
-
-# configuration choose:
-# 1. volume
-# 2. frequency (will sound differnent)
-# 3. block size
-# 4. calc_interval

@@ -7,8 +7,8 @@ from LogSetup import  SetupLogger
 from AudioTransport.AudioConfig import Config  
 import logging
 from GuiHelpers import GuiHandler
-# import ttkbootstrap as ttk
-# from ttkbootstrap.constants import INFO
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import INFO
 
 logger = SetupLogger("[main.py]", logging.DEBUG)
 
@@ -37,7 +37,7 @@ def apply_css_styles():
         borderwidth=0,  # no border
     )
     style.map("Blue.TButton",
-              background=[("active", "#B0E0E6")])  # Slightly lighter blue when active
+              background=[("active", "#B0E0E6")])  # slightly lighter blue when active
 
 # display the main menu
 def show_main_menu():
@@ -122,9 +122,10 @@ def show_sender_view():
     )
     back_button.pack(pady=10, anchor="w", side="top")
 
-    Send(current_frame, Config(volume = 0.2))
+    Send(current_frame, Config())
 
-# Initialize Tkinter window
+
+# initialize Tkinter window
 root = tk.Tk()
 root.title("File Transfer GUI")
 root.geometry("800x770")
@@ -132,10 +133,13 @@ root.geometry("800x770")
 apply_css_styles()
 
 current_frame = None
-output_text = tk.Text(root, state="disabled", height=25)
-output_text.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+output_text = tk.Text(root, state="disabled", height=20, bg="lightgrey", bd=2, relief="solid")
+output_text.pack(side=tk.BOTTOM, fill=tk.X)
+root.update_idletasks()  # force GUI layout update
 
 logging.getLogger().addHandler(GuiHandler(output_text))
 logging.getLogger().setLevel(logging.INFO)
+
 show_main_menu()
 root.mainloop()

@@ -1,9 +1,18 @@
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import INFO
 
+# first Slider (binary)
+MIN_SLIDER_1 = 0
+MAX_SLIDER_1 = 1
 
+# second slider values - 1000, 3000, 8000, 15000
+SECOND_SLIDER_VALUES = [1000, 3000, 8000, 15000]
+
+# Third slider values - 2, 5, 20, 50
+THIRD_SLIDER_VALUES = [2, 5, 20, 50]
+
+# css
 def apply_custom_styles():
-    # css color, border, and etc
     style = ttk.Style()
     style.configure(
         "Blue.TButton",
@@ -18,29 +27,34 @@ def apply_custom_styles():
 
     style.configure("GreyFrame.TFrame", background="#D3D3D3")  # grey background
 
+
 def create_ui(
+    # the function paramaters
     frame,
     first_button_action,
     second_button_action,
+    conf,
     first_butt_name="Select",
     second_butt_name="Start",
-    slider_name1="Slider 1",
-    slider_name2="Slider 2",
-    slider_name3="Slider 3",
+    slider_name1="Binary Slider",
+    slider_name2="Frequency Slider",
+    slider_name3="Block Size Slider",
 ):
     apply_custom_styles()
 
-    # create a parent frame (hold the container_frame and graph)
+    # xtore current slider values
+    slider_values = {
+        "num_slider1": MIN_SLIDER_1,
+        "num_slider2": SECOND_SLIDER_VALUES[0] if SECOND_SLIDER_VALUES else None,
+        "num_slider3": THIRD_SLIDER_VALUES[0] if THIRD_SLIDER_VALUES else None,
+    }
+
     parent_frame = ttk.Frame(frame)
     parent_frame.pack(pady=20, padx=20, fill="both", expand=True)
-    parent_frame.config(width=200, height=500)  # Ensure the parent frame is large enough
+    parent_frame.config(width=200, height=500)
 
-    # place the container frame
     container_frame = ttk.Frame(parent_frame, padding=10, relief="solid")
     container_frame.place(x=0, y=0, width=300, height=300)
-
-    # add a label inside the container frame (for visibility)
-    ttk.Label(container_frame).pack()
 
     # first button
     ttk.Button(
@@ -51,43 +65,72 @@ def create_ui(
         width=25,
     ).pack(pady=10, anchor="w", side="top")
 
-    # second button
+    # use the set methods from AudioConfig.py
+    def set_config():
+        # if "num_slider1" in slider_values and slider_values["num_slider1"] is not None:
+        #     conf.set_volume(slider_values["num_slider1"])
+        if "num_slider2" in slider_values and slider_values["num_slider2"] is not None:
+            conf.set_frequency(slider_values["num_slider2"])  
+        if "num_slider3" in slider_values and slider_values["num_slider3"] is not None:
+            conf.set_blockSize(slider_values["num_slider3"])  
+
+
+    # button
     ttk.Button(
         container_frame,
         text=second_butt_name,
-        command=second_button_action,
+        command=lambda: [set_config(), second_button_action()],
         style="Blue.TButton",
         width=25,
     ).pack(pady=10, anchor="w", side="top")
 
-    # update the displayed value of the sliders
-    def update_slider_label(slider, label):
-        value = slider.get()
-        label.config(text=f"{value:.1f}")
+    def update_slider_label(value, label, var_name, discrete_values=None):
+        if discrete_values:
+            index = round(float(value))
+            slider_values[var_name] = discrete_values[index]
+            value = discrete_values[index]
+        else:
+            value = round(float(value))
+            slider_values[var_name] = value
+        label.config(text=f"{value}")
 
-    # sliders
-    for i, (label_text, slider_range) in enumerate(
-        [
-            (slider_name1, (0, 100)),
-            (slider_name2, (0, 50)),
-            (slider_name3, (1, 10)),
-        ]
-    ):
+    sliders_config = [
+        (slider_name1, (MIN_SLIDER_1, MAX_SLIDER_1), "num_slider1", None, None),
+        (slider_name2, SECOND_SLIDER_VALUES, "num_slider2", None, SECOND_SLIDER_VALUES),
+        (slider_name3, THIRD_SLIDER_VALUES, "num_slider3", None, THIRD_SLIDER_VALUES),
+    ]
+
+    for slider in sliders_config:
+        if slider[0] is None:  # Skip rendering this slider if its name is None
+            continue
+
+        label_text, slider_range, var_name, step, discrete_values = slider
         slider_frame = ttk.Frame(container_frame)
         slider_frame.pack(anchor="w", pady=5)
 
-        ttk.Label(slider_frame, text=label_text).pack(side="left")
-        slider_value = ttk.Label(slider_frame, text=str(slider_range[0]), width=5)
-        slider_value.pack(side="left", padx=5)
-        ttk.Label(slider_frame, text=str(slider_range[0])).pack(side="left")
+        ttk.Label(slider_frame, text=label_text).pack(side="left", padx=5)
 
-        slider = ttk.Scale(
-            slider_frame,
-            from_=slider_range[0],
-            to=slider_range[1],
-            orient="horizontal",
-            length=200,
-        )
+        slider_value_label = ttk.Label(slider_frame, text=str(slider_range[0] if isinstance(slider_range, tuple) else slider_range[0]), width=10)
+        slider_value_label.pack(side="left", padx=5)
+
+        if discrete_values is None:
+            slider = ttk.Scale(
+                slider_frame,
+                from_=slider_range[0],
+                to=slider_range[1],
+                orient="horizontal",
+                length=200,
+                command=lambda value, sv=slider_value_label, vn=var_name: update_slider_label(value, sv, vn),
+            )
+        else:
+            slider = ttk.Scale(
+                slider_frame,
+                from_=0,
+                to=len(discrete_values) - 1,
+                orient="horizontal",
+                length=200,
+                command=lambda value, sv=slider_value_label, vn=var_name, dv=discrete_values: update_slider_label(
+                    value, sv, vn, dv
+                ),
+            )
         slider.pack(side="left", padx=5)
-        ttk.Label(slider_frame, text=str(slider_range[1])).pack(side="left")
-        slider.config(command=lambda value, sv=slider_value: update_slider_label(slider, sv))

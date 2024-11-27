@@ -1,21 +1,21 @@
-import os
-import tkinter as tk
-from tkinter import ttk
+# style
 from tkinter import filedialog
+from Style import create_ui
+from ttkbootstrap.constants import INFO, SUCCESS
+
+# standart
+import os
+import threading
+
+# functions
 from App.ApplicationLayerFunctions import ReceiveAndSaveFile
 from AudioTransport.AudioConfig import Config  
-import os
 from LogSetup import SetupLogger
 from AudioTransport.PhysicalLayer.tools.GraphRecv import create_graph, change_graph
 import logging
-import threading
-import ttkbootstrap as ttk
-from ttkbootstrap.constants import INFO, SUCCESS
-from Style import create_ui
 
 logger = SetupLogger("[RecvTest.py]", logging.DEBUG)
 selected_folder = None
-
 
 def Recv(receiver_frame, config:Config):
     global selected_folder
@@ -49,14 +49,16 @@ def Recv(receiver_frame, config:Config):
         except Exception as e:
             logger.error(f"Error during file reception: {e}")
 
-    # use UI
+    # UI
     create_ui(
         receiver_frame,
         first_button_action=open_folder_dialog,
         second_button_action=receive_data,
+        conf=config,
         first_butt_name="Select Folder to Save Files",
         second_butt_name="Start Listening",
-        slider_name1="Block Size",
-        slider_name2="Calc Interval",
-        slider_name3="?????"
+        slider_name1="Volume",
+        slider_name2="Frequency",
+        # slider_name3=None
+        slider_name3="Block Size"
     )

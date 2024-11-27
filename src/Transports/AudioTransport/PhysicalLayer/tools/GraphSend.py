@@ -3,11 +3,13 @@ from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 import numpy as np
 import io
+import threading
+
 
 def change_graph(parent_frame):
     # generate updated data
     x = np.linspace(0, 10, 100)
-    return _update_graph(parent_frame, x, np.sin(x), "sender frames", moving=True)
+    return _update_graph(parent_frame, x, np.sin(x), "receiver frames", moving=True)
 def create_graph(parent_frame):
     # Generate an empty graph
     x = []
@@ -66,6 +68,7 @@ def _update_graph(parent_frame, x, y, title, moving=False):
     graph_label = tk.Label(parent_frame, image=img, bg="white")
     graph_label.image = img
     graph_label.place(relx=1.0, rely=0.5, anchor="e", x=-8, y=20)
+
 
     # start the animation if moving is enabled
     if moving:

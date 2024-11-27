@@ -39,6 +39,10 @@ class LogSender:
 
 class GuiHandler(logging.Handler):
     def __init__(self, output_text) -> None:
+        for handler in logging.getLogger().handlers:
+            if isinstance(handler, GuiHandler):
+                logging.getLogger().removeHandler(handler)
+
         self.log_queue = queue.Queue()  # create a thread-safe queue
         self.sender = LogSender(output_text=output_text, log_queue=self.log_queue)
         logging.Handler.__init__(self)

@@ -1,15 +1,17 @@
-import os
-import tkinter as tk
+# style
+from Style import create_ui
+from ttkbootstrap.constants import INFO, SUCCESS
+
+# standart
+import threading
+
+# # functions
 from tkinter import filedialog
 from App.ApplicationLayerFunctions import TransferFile
 from LogSetup import SetupLogger
 import logging
 from AudioTransport.PhysicalLayer.tools.GraphSend import create_graph, change_graph
 from AudioTransport.AudioConfig import Config  
-import threading
-import ttkbootstrap as ttk
-from ttkbootstrap.constants import INFO, SUCCESS
-from Style import create_ui
 
 logger = SetupLogger("[SendTest]", logging.DEBUG)
 selected_file_path = None
@@ -51,14 +53,15 @@ def Send(sender_frame,config:Config):
         except Exception as e:
             logger.error(f"[SendTest.py] Error sending file: {e}")
 
-    # use UI
+    # UI
     create_ui(
         sender_frame,
         first_button_action=open_file_dialog,
         second_button_action=send_file,
+        conf=config,
         first_butt_name="Select File to Send",
         second_butt_name="Send",
-        slider_name1="Voulme",
+        slider_name1="Volume",
         slider_name2="Frequency",
         slider_name3="Block Size"
     )

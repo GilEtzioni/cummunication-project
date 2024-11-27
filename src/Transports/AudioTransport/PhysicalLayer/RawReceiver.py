@@ -160,6 +160,9 @@ class AudioReceiver:
         return self.received, self.snr
     
 def RecvFrameRaw(config = Config(),timeout = 0):
+    logger.info(f"volume: {config.get_volume()}")
+    logger.info(f"frequency size: {config.get_frequency()}")
+    logger.info(f"block size: {config.get_blockSize()}")
     global ret
     
     # TODO add configuration when creating AudioReceiver
