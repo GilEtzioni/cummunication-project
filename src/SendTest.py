@@ -16,9 +16,11 @@ from AudioTransport.AudioConfig import Config
 logger = SetupLogger("[SendTest]", logging.DEBUG)
 selected_file_path = None
 
-def Send(sender_frame,config:Config):
+def Send(sender_frame,config:Config,path_from_cli=None):
     global selected_file_path
-
+    if path_from_cli:
+        selected_file_path = path_from_cli
+        logger.info(f"File selected: {selected_file_path}")
     graph_holder = {}  # Use a dictionary to hold the graph label reference
     graph_holder['graph_label'] = create_graph(sender_frame)  # create graph --> maybe i will change the logic
 
@@ -63,5 +65,5 @@ def Send(sender_frame,config:Config):
         second_butt_name="Send",
         slider_name1="Volume",
         slider_name2="Frequency",
-        slider_name3="Block Size"
+        slider_name3="Bitrate"
     )

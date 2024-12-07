@@ -33,5 +33,5 @@ class Config:
         return self.speedBPS
 
 
-    def set_blockSize(self, speedBPS):
+    def set_bitrate(self, speedBPS):
         self.speedBPS = speedBPS

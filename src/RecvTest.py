@@ -17,9 +17,11 @@ import logging
 logger = SetupLogger("[RecvTest.py]", logging.DEBUG)
 selected_folder = None
 
-def Recv(receiver_frame, config:Config):
+def Recv(receiver_frame, config:Config,path_from_cli=None):
     global selected_folder
-
+    if path_from_cli:
+        selected_folder = path_from_cli
+        logger.info(f"Folder selected: {os.path.abspath(selected_folder)}")
     graph_holder = {}
     graph_holder['graph_label'] = create_graph(receiver_frame)  # create graph --> maybe i will change the logic
 

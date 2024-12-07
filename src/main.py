@@ -1,4 +1,5 @@
 import tkinter as tk
+import argparse
 from tkinter import ttk
 from PIL import Image, ImageTk
 from RecvTest import Recv
@@ -101,7 +102,7 @@ def show_receiver_view():
     )
     back_button.pack(pady=10, anchor="w", side="top")
 
-    Recv(current_frame, Config()) 
+    Recv(current_frame, Config(),args.path) 
 
 # switch to the sender view
 def show_sender_view():
@@ -122,7 +123,7 @@ def show_sender_view():
     )
     back_button.pack(pady=10, anchor="w", side="top")
 
-    Send(current_frame, Config())
+    Send(current_frame, Config(),args.path)
 
 
 # initialize Tkinter window
@@ -140,6 +141,20 @@ root.update_idletasks()  # force GUI layout update
 
 logging.getLogger().addHandler(GuiHandler(output_text))
 logging.getLogger().setLevel(logging.INFO)
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="File Transfer GUI")
+parser.add_argument('--sender', action='store_true', help="Run as sender")
+parser.add_argument('--receiver', action='store_true', help="Run as receiver")
+parser.add_argument('--path', type=str, help="Path to the file to send or folder to save received files")
+args = parser.parse_args()
+if args.sender and args.receiver:
+    logger.error("Please choose either sender or receiver")
+    exit(1)
 
-show_main_menu()
+if args.receiver:
+    show_receiver_view()
+elif args.sender:
+    show_sender_view()
+else:
+    show_main_menu()
 root.mainloop()

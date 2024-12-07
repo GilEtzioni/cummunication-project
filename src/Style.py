@@ -38,11 +38,11 @@ def create_ui(
     second_butt_name="Start",
     slider_name1="Binary Slider",
     slider_name2="Frequency Slider",
-    slider_name3="Block Size Slider",
+    slider_name3="BitRate Slider",
 ):
     apply_custom_styles()
 
-    # xtore current slider values
+    # store current slider values
     slider_values = {
         "num_slider1": MIN_SLIDER_1,
         "num_slider2": SECOND_SLIDER_VALUES[0] if SECOND_SLIDER_VALUES else None,
@@ -72,7 +72,7 @@ def create_ui(
         if "num_slider2" in slider_values and slider_values["num_slider2"] is not None:
             conf.set_frequency(slider_values["num_slider2"])  
         if "num_slider3" in slider_values and slider_values["num_slider3"] is not None:
-            conf.set_blockSize(slider_values["num_slider3"])  
+            conf.set_bitrate(slider_values["num_slider3"])  
 
 
     # button
