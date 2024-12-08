@@ -23,8 +23,8 @@ def Recv(receiver_frame, config:Config,path_from_cli=None):
         selected_folder = path_from_cli
         logger.info(f"Folder selected: {os.path.abspath(selected_folder)}")
     graph_holder = {}
-    graph_holder['graph_label'] = create_graph(receiver_frame)  # create graph --> maybe i will change the logic
-
+    graph_holder['graph_label'] = create_graph(receiver_frame,config)  # create graph --> maybe i will change the logic
+    
     # open a folder dialog --> select a folder for saving files
     def open_folder_dialog():
         global selected_folder
@@ -59,8 +59,4 @@ def Recv(receiver_frame, config:Config,path_from_cli=None):
         conf=config,
         first_butt_name="Select Folder to Save Files",
         second_butt_name="Start Listening",
-        slider_name1="Volume",
-        slider_name2="Frequency",
-        # slider_name3=None
-        slider_name3="Block Size"
     )

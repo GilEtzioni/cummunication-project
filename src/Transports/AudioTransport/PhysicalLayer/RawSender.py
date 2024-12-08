@@ -24,7 +24,7 @@ class AudioEncoder:
         # print(f"rfftSize {rfftSize}")
         availableFreqs=np.fft.rfftfreq(rfftSize,1/conf.sampleRate)
         print(availableFreqs)
-        self.usedFreqs= availableFreqs[availableFreqs>=conf.freq][:conf.freq]
+        self.usedFreqs= availableFreqs[availableFreqs>=conf.freq][:256]
         # if(np.max(self.usedFreqs)>conf.MaxFrequency or len(self.usedFreqs)<conf.freq):
         #     logger.error("Error: not enough frequencies")
 

@@ -1,6 +1,6 @@
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import INFO
-
+from tkinter import DoubleVar
 # first Slider (binary)
 MIN_SLIDER_1 = 0
 MAX_SLIDER_1 = 1
@@ -36,18 +36,10 @@ def create_ui(
     conf,
     first_butt_name="Select",
     second_butt_name="Start",
-    slider_name1="Binary Slider",
-    slider_name2="Frequency Slider",
-    slider_name3="BitRate Slider",
+    has_volume = True,
 ):
     apply_custom_styles()
 
-    # store current slider values
-    slider_values = {
-        "num_slider1": MIN_SLIDER_1,
-        "num_slider2": SECOND_SLIDER_VALUES[0] if SECOND_SLIDER_VALUES else None,
-        "num_slider3": THIRD_SLIDER_VALUES[0] if THIRD_SLIDER_VALUES else None,
-    }
 
     parent_frame = ttk.Frame(frame)
     parent_frame.pack(pady=20, padx=20, fill="both", expand=True)
@@ -64,15 +56,14 @@ def create_ui(
         style="Blue.TButton",
         width=25,
     ).pack(pady=10, anchor="w", side="top")
-
+    
     # use the set methods from AudioConfig.py
     def set_config():
-        # if "num_slider1" in slider_values and slider_values["num_slider1"] is not None:
-        #     conf.set_volume(slider_values["num_slider1"])
-        if "num_slider2" in slider_values and slider_values["num_slider2"] is not None:
-            conf.set_frequency(slider_values["num_slider2"])  
-        if "num_slider3" in slider_values and slider_values["num_slider3"] is not None:
-            conf.set_bitrate(slider_values["num_slider3"])  
+        if has_volume:
+            conf.set_volume(volume.get())
+        conf.set_bitrate(int(bitrate.get()))
+        conf.set_frequency(int(frequency.get()))
+
 
 
     # button
@@ -83,54 +74,19 @@ def create_ui(
         style="Blue.TButton",
         width=25,
     ).pack(pady=10, anchor="w", side="top")
-
-    def update_slider_label(value, label, var_name, discrete_values=None):
-        if discrete_values:
-            index = round(float(value))
-            slider_values[var_name] = discrete_values[index]
-            value = discrete_values[index]
-        else:
-            value = round(float(value))
-            slider_values[var_name] = value
-        label.config(text=f"{value}")
-
-    sliders_config = [
-        (slider_name1, (MIN_SLIDER_1, MAX_SLIDER_1), "num_slider1", None, None),
-        (slider_name2, SECOND_SLIDER_VALUES, "num_slider2", None, SECOND_SLIDER_VALUES),
-        (slider_name3, THIRD_SLIDER_VALUES, "num_slider3", None, THIRD_SLIDER_VALUES),
-    ]
-
-    for slider in sliders_config:
-        if slider[0] is None:  # Skip rendering this slider if its name is None
-            continue
-
-        label_text, slider_range, var_name, step, discrete_values = slider
-        slider_frame = ttk.Frame(container_frame)
-        slider_frame.pack(anchor="w", pady=5)
-
-        ttk.Label(slider_frame, text=label_text).pack(side="left", padx=5)
-
-        slider_value_label = ttk.Label(slider_frame, text=str(slider_range[0] if isinstance(slider_range, tuple) else slider_range[0]), width=10)
-        slider_value_label.pack(side="left", padx=5)
-
-        if discrete_values is None:
-            slider = ttk.Scale(
-                slider_frame,
-                from_=slider_range[0],
-                to=slider_range[1],
-                orient="horizontal",
-                length=200,
-                command=lambda value, sv=slider_value_label, vn=var_name: update_slider_label(value, sv, vn),
-            )
-        else:
-            slider = ttk.Scale(
-                slider_frame,
-                from_=0,
-                to=len(discrete_values) - 1,
-                orient="horizontal",
-                length=200,
-                command=lambda value, sv=slider_value_label, vn=var_name, dv=discrete_values: update_slider_label(
-                    value, sv, vn, dv
-                ),
-            )
-        slider.pack(side="left", padx=5)
+    def add_dropdown(name:str, options:list, default:float|int):
+        drop_frame = ttk.Frame(container_frame)
+        drop_frame.pack( anchor="w", side="top",fill="both")
+        label = ttk.Label( drop_frame , text = name ) 
+        label.pack(pady=10, anchor="w", side="left")
+        var = DoubleVar()
+        var.set(default)
+        drop = ttk.OptionMenu(drop_frame, var ,var.get(),*options)
+        drop.pack(pady=10, anchor="w", side="right")
+        return var
+    if has_volume:
+        volume = add_dropdown("Volume:", [x/10.0 for x in range(0,11)], 0.5)
+    bitrate = add_dropdown("Bitrate (Bps):", [2, 5, 10], 5)
+    frequency = add_dropdown("Start Frequency (Hz):", [300,1000,2000,10000], 2000)
+    set_config()
+   

@@ -21,8 +21,8 @@ def Send(sender_frame,config:Config,path_from_cli=None):
     if path_from_cli:
         selected_file_path = path_from_cli
         logger.info(f"File selected: {selected_file_path}")
-    graph_holder = {}  # Use a dictionary to hold the graph label reference
-    graph_holder['graph_label'] = create_graph(sender_frame)  # create graph --> maybe i will change the logic
+    # graph_holder = {}  # Use a dictionary to hold the graph label reference
+    # graph_holder['graph_label'] = create_graph(sender_frame)  # create graph --> maybe i will change the logic
 
     # open a file dialog --> select a file to send
     def open_file_dialog():
@@ -50,8 +50,8 @@ def Send(sender_frame,config:Config,path_from_cli=None):
             logger.info(f"[SendTest.py] File sent successfully: {selected_file_path}")
 
             # update the graph after the user start listening
-            graph_holder['graph_label'].destroy()
-            graph_holder['graph_label'] = change_graph(sender_frame)
+            # graph_holder['graph_label'].destroy()
+            # graph_holder['graph_label'] = change_graph(sender_frame)
         except Exception as e:
             logger.error(f"[SendTest.py] Error sending file: {e}")
 
@@ -63,7 +63,5 @@ def Send(sender_frame,config:Config,path_from_cli=None):
         conf=config,
         first_butt_name="Select File to Send",
         second_butt_name="Send",
-        slider_name1="Volume",
-        slider_name2="Frequency",
-        slider_name3="Bitrate"
+        has_volume=True,
     )

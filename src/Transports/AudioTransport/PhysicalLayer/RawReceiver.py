@@ -80,6 +80,7 @@ class AudioReceiver:
         self.fullData= np.zeros(self.fftsize)
         self.samplesToHold = self.maxRawFrameSize*self.samplesPerByte
         self.waitAtEnd = self.samplesToHold
+        self.conf = conf
         self.snr = 0
         self.step =self.samplesPerByte
         allFreqs = np.fft.rfftfreq(self.fftsize,1/conf.sampleRate )
@@ -104,7 +105,8 @@ class AudioReceiver:
         self.fullData = np.roll(self.fullData, -shift)
         self.fullData[-shift:] = data
         val,sig,noise = self.processChunk(self.fullData[-self.fftsize:])
-        self.sampleVals.append(val)
+        self.conf.graphData = self.fullData
+        self.sampleVals.append(val)        
         self.sampleSigs.append(sig)
         self.sampleNoises.append(noise)
         if len(self.sampleVals)>self.samplesToHold:
@@ -141,6 +143,7 @@ class AudioReceiver:
         self.sampleSigs = []
         self.sampleVals = []
         self.waitAtEnd = 100
+        self.fullData = np.zeros(self.fftsize)
         logger.debug("Receiving frame")
         blocksLeftToTimeout = timeout*1000/self.calcIntervalMs
         self.stream =  sd.InputStream(channels=1,samplerate=self.sampleRate,blocksize=int(self.calcIntervalSamples))
@@ -160,9 +163,9 @@ class AudioReceiver:
         return self.received, self.snr
     
 def RecvFrameRaw(config = Config(),timeout = 0):
-    logger.info(f"volume: {config.get_volume()}")
-    logger.info(f"frequency size: {config.get_frequency()}")
-    logger.info(f"block size: {config.get_blockSize()}")
+    logger.debug(f"volume (%): {config.get_volume()}")
+    logger.debug(f"frequency start (HZ): {config.get_frequency()}")
+    logger.debug(f"bitrate (bps): {config.get_bitrate()}")
     global ret
     
     # TODO add configuration when creating AudioReceiver

@@ -4,33 +4,36 @@ import matplotlib.pyplot as plt
 import numpy as np
 import io
 import threading
-
+config = None
 
 def change_graph(parent_frame):
     # generate updated data
     x = np.linspace(0, 10, 100)
     return _update_graph(parent_frame, x, np.sin(x), "receiver frames", moving=True)
-def create_graph(parent_frame):
+def create_graph(parent_frame,conf):
+    global config
+    config = conf
     # Generate an empty graph
     x = []
     y = []
     return _update_graph(parent_frame, x, y, "", moving=False)
-
+maxdata=0
 def _update_graph(parent_frame, x, y, title, moving=False):
     def animate():
         nonlocal y
+        global maxdata
         # update the data to make the graph move
-        y = np.roll(y, -1)  # Shift data for animation
-        y[-1] = np.sin(np.pi * (np.random.rand()))  # Append a random value
-
+        # y = np.roll(y, -1)  # Shift data for animation
+        # y[-1] = np.sin(np.pi * (np.random.rand()))  # Append a random value
         # create a new figure
         fig, ax = plt.subplots(figsize=(4, 3))  # Width = 2 inches, Height = 1.5 inches
-        ax.plot(x, y)
+        ax.plot(config.graphData)
         ax.set_title(title, fontsize=8)
         ax.set_xlabel("X-axis", fontsize=6)
         ax.set_ylabel("Y-axis", fontsize=6)
         ax.tick_params(axis='both', which='major', labelsize=6)
-
+        maxdata= max(maxdata,np.max(config.graphData))
+        ax.set_ylim( -maxdata, maxdata)
         # save the figure to an in-memory buffer
         buf = io.BytesIO()
         fig.savefig(buf, format='png', dpi=100)
@@ -46,7 +49,7 @@ def _update_graph(parent_frame, x, y, title, moving=False):
 
         # schedule the next update
         if moving:
-            parent_frame.after(500, animate)  # update every 500ms
+            parent_frame.after(20, animate)  # update every 500ms
 
     # initialize the graph
     fig, ax = plt.subplots(figsize=(4, 3))

@@ -42,7 +42,7 @@ def SendFrame(data: bytes,frameNumber: int,config: Config,retries = 3)-> bool:
         except TimeoutError:
             logger.warning("Timeout receiving ACK from receiver")
             continue
-        logger.error(f"Frame sent successfully {received}")
+        logger.info(f"Frame sent successfully {received}")
         return
     
     logger.info("Frame sending failed")
