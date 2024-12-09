@@ -74,7 +74,7 @@ def SendFrameRaw(data,config: Config = Config()):
     logger.debug(data)
     # TODO add configuration when creating encoder
     waveForm = GenerateWaveform(data,config)
-    logger.info("Playing waveform")
+    logger.debug("Playing waveform")
     sd.play(waveForm,blocking=True,samplerate=config.sampleRate)
     logger.debug("Waveform played")
 

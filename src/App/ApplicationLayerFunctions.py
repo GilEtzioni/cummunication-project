@@ -21,21 +21,22 @@ def TransferFile(filepath: str,config:Config):
     try:
         filename = os.path.basename(filepath)  # e.g., example.txt
         filelen = os.path.getsize(filepath)    # e.g., 115
-        logger.info(f"Starting SendFile from {filepath}")
+        logger.info(f"Starting SendFile from {filepath}\n")
         SendFile(filepath, filelen, filename,config)
-        logger.info(f"File '{filepath}' sent successfully.")
+        logger.info(f"\nFile '{filepath}' sent successfully.")
 
     except Exception as e:
-        logger.error(f"Error during file transfer: {e}")
+        logger.error(f"Sending stopped because {e}")
+
 
 
 # get a file and saves it to the specified directory
 def ReceiveAndSaveFile(output_dir: str,config:Config) -> str:
-    logger.info(f"Waiting to receive file...")
+    logger.info(f"Waiting to receive file...\n")
     try:
         filename = ReceiveFile(output_dir,config)            # get filename from the header
         filepath = os.path.join(output_dir, filename) # compute the full file path
-        logger.info(f"File received and saved as '{filepath}'.")
+        logger.info(f"\nFile received and saved as '{filepath}'.")
         return filepath
     except Exception as e:
         logger.error(f"Error during file reception: {e}. try again.")

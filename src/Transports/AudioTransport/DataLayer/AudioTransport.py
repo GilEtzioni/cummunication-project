@@ -24,14 +24,14 @@ def RecvFrame(expectedFrameNum,config:Config) -> bytes:
         logger.warning(f"received frame {int(received[0])} twice")
         SendFrameRaw(b'1',config)
         
-    logger.info(f"Frame received successfully: {received}")
+    logger.debug(f"Frame received successfully: {received}")
     # respond to sender to indicate that the frame was received
     SendFrameRaw(b'1',config)
     return received[1:]
     
 def SendFrame(data: bytes,frameNumber: int,config: Config,retries = 3)-> bool:
     """Send Frame of up to 40 bytes and return True if successful False if not"""
-    logger.info(f"Sending frame: {data}")
+    logger.debug(f"Sending frame: {data}")
 
     for _ in range(retries):
         SendFrameRaw((frameNumber%256).to_bytes(1)+data,config)
@@ -40,12 +40,12 @@ def SendFrame(data: bytes,frameNumber: int,config: Config,retries = 3)-> bool:
         try:
             received,_ = RecvFrameRaw(config = config,timeout = 3)
         except TimeoutError:
-            logger.warning("Timeout receiving ACK from receiver")
+            logger.warning("\nTimeout receiving ACK from receiver\n")
             continue
         logger.info(f"Frame sent successfully {received}")
         return
     
-    logger.info("Frame sending failed")
+    logger.debug("Frame sending failed")
     raise Exception(f"Frame sending failed after {retries} retries")
 
 

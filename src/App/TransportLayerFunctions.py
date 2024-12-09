@@ -27,14 +27,14 @@ def SendFile(filepath, filelen, filename,config:Config):
             "FileLen": filelen,
         }
         header_bytes = CreateHeader(header)          # convert header to bytes
-        logger.info(f"Sending header: {header}")
+        logger.debug(f"Sending header: {header}")
 
         SendFrame(header_bytes,frameNumber,config)  # send the header
         frameNumber += 1
         # ----------------------------- without the delay .pdf will fail! -----------------------------
         time.sleep(0.02)
 
-        logger.info(f"Sending file content in chunks of {CHUNK} bytes...")
+        logger.debug(f"Sending file content in chunks of {CHUNK} bytes...")
         try:
             with open(filepath, "rb") as f:  # read
                 chunk_number = 0
@@ -48,9 +48,9 @@ def SendFile(filepath, filelen, filename,config:Config):
             logger.error(f"Error while sending file parts: {e}")
             raise
 
-        logger.info(f"File '{filename}' sent successfully.")
+        logger.debug(f"File '{filename}' sent successfully.")
     except Exception as e:
-        logger.error(f"Error in SendFile: {e}")
+        logger.debug(f"Error in SendFile: {e}")
         raise
 
 
@@ -91,7 +91,7 @@ def ReceiveFile(output_dir: str,config: Config) -> str:
             logger.error(f"Error while receiving file parts: {e}")
             raise
 
-        logger.info(f"File '{filename}' has been processed.")
+        logger.debug(f"File '{filename}' has been processed.")
         return filename
 
     except Exception as e:
@@ -115,7 +115,7 @@ def CreateHeader(header: dict) -> bytes:
         # ensure the header = exactly 256 bytes (add zeros)
         header_bytes = header_bytes.ljust(CHUNK, b'\0')[:CHUNK]
 
-        logger.info(f"header bytes: {header_bytes}")
+        logger.debug(f"header bytes: {header_bytes}")
         return header_bytes
 
     except Exception as e:
@@ -141,7 +141,7 @@ def UnpackHeader(header_bytes: bytes) -> dict:
             "FileName": filename,
             "FileLen": file_len,
         }
-        logger.info(f"unpacked header: {unpacked_header}")
+        logger.debug(f"unpacked header: {unpacked_header}")
         return unpacked_header
 
     except Exception as e:

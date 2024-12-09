@@ -31,11 +31,14 @@ class LogSender:
 
     def write_log(self, msg: logging.LogRecord) -> None:
         if msg.levelno == logging.INFO:
-            self.log_queue.put(f"INFO: [{msg.module}] {msg.message}")
+            # self.log_queue.put(f"INFO: [{msg.module}] {msg.message}")
+            self.log_queue.put(f"{msg.message}")
         elif msg.levelno == logging.WARNING:
-            self.log_queue.put(f"WARN: [{msg.module}] {msg.message}")
+            # self.log_queue.put(f"WARN: [{msg.module}] {msg.message}")
+            self.log_queue.put(f"{msg.message}")
         elif msg.levelno == logging.ERROR:
-            self.log_queue.put(f"ERROR: [{msg.module}] {msg.message}")
+            self.log_queue.put(f"{msg.message}")
+            # self.log_queue.put(f"ERROR: [{msg.module}] {msg.message}")
 
 class GuiHandler(logging.Handler):
     def __init__(self, output_text) -> None:

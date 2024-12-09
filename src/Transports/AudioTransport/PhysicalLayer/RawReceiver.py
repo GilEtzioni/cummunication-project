@@ -150,7 +150,7 @@ class AudioReceiver:
         self.stream.start()
         while not self.complete:
             if timeout !=0 and blocksLeftToTimeout<0:
-                logger.warning("Timeout receiving audio")
+                logger.debug("Timeout receiving audio")
                 raise TimeoutError
             blocksLeftToTimeout-=1
             data,missedSamples = self.stream.read(self.calcIntervalSamples)
@@ -158,7 +158,7 @@ class AudioReceiver:
                 logger.debug(f"missed samples when receiving audio maybe try reducing processing time")
             self.processAudioSample(data[:,0])
         self.stream.stop()
-        logger.info(f"received: {self.received} len{len(self.received)} snr: {self.snr}")
+        logger.debug(f"received: {self.received} len{len(self.received)} snr: {self.snr}")
     
         return self.received, self.snr
     
