@@ -33,7 +33,7 @@ def _update_graph(parent_frame, x, y, title, moving=False):
         ax.set_ylabel("Y-axis", fontsize=6)
         ax.tick_params(axis='both', which='major', labelsize=6)
         maxdata= max(maxdata,np.max(config.graphData))
-        ax.set_ylim( -maxdata, maxdata)
+        ax.set_ylim(0, maxdata)
         # save the figure to an in-memory buffer
         buf = io.BytesIO()
         fig.savefig(buf, format='png', dpi=100)

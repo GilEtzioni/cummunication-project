@@ -94,6 +94,7 @@ class AudioReceiver:
 
     def processChunk(self,chunkData):
         fft = self.fftChunk(chunkData)[self.lowFreqIndex: self.lowFreqIndex+256]
+        self.conf.graphData = fft
         value = int(np.argmax(fft))
         # print(value)
         matchLevel = np.max(fft)
@@ -105,7 +106,7 @@ class AudioReceiver:
         self.fullData = np.roll(self.fullData, -shift)
         self.fullData[-shift:] = data
         val,sig,noise = self.processChunk(self.fullData[-self.fftsize:])
-        self.conf.graphData = self.fullData
+
         self.sampleVals.append(val)        
         self.sampleSigs.append(sig)
         self.sampleNoises.append(noise)
