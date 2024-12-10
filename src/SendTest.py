@@ -29,13 +29,18 @@ def Send(sender_frame,config:Config,path_from_cli=None):
         global selected_file_path
         file_path = filedialog.askopenfilename(
             title="Select a File to Send",
-            filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("PDF Files", "*.pdf")),
+            filetypes=(("Text Files", "*.txt"), ("PDF Files", "*.pdf")),
         )
         if file_path:
-            selected_file_path = file_path
-            logger.info(f"File selected: {file_path}")
+            # check the file extension
+            if file_path.endswith(('.txt', '.pdf')):
+                selected_file_path = file_path
+                logger.info(f"File selected: {file_path}")
+            else:
+                # Show error message for invalid file types
+                logger.error("Invalid File - Please select .txt or .pdf file.")
         else:
-            logger.info("[No file selected.")
+            logger.info("No file selected.")
 
     # send the selected file
     def send_file():
