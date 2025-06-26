@@ -1,11 +1,14 @@
-# Computer Science Final Project in Computer Communication (by Gil Etzioni and Zack Portnoy)
+![image](https://github.com/user-attachments/assets/1e0b5680-9b3b-4b5f-8bc3-4a55b1cad9af)# Computer Science Final Project in Computer Communication (by Gil Etzioni and Zack Portnoy)
 
 Developed a system to transmit data between two computers using speakers and microphones. The sender produces tones, and the receiver listens and decodes the signals. This project showcases skills in audio processing, data transmission, and computer networking.
 
 
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/3-classDiagram.jpg?raw=true)
-
-
+![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/2-demo.jpg?raw=true)
+![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/4-theoretic.jpg?raw=true)
+![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/4-theoretic.jpg?raw=true)
+![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/6-theoretic.jpg?raw=true)
+![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/6-theoretic.jpg?raw=true)
 
 
 ## Prerequisites
