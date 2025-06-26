@@ -1,10 +1,17 @@
 # Computer Science Final Project in Computer Communication (by Gil Etzioni and Zack Portnoy)
 
-Developed a system to transmit data between two computers using speakers and microphones. The sender produces tones, and the receiver listens and decodes the signals. This project showcases skills in audio processing, data transmission, and computer networking.
+This project demonstrates a system designed to transmit data between two computers using speakers and microphones. The sender produces tones, and the receiver listens and decodes the signals. This project highlights skills in audio processing, data transmission, and computer networking.
+
+# Project Overview
+The system enables audio-based communication between two computers. The sender generates specific tones that are decoded by the receiver, showcasing an innovative approach to data transmission using sound waves.
 
 
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/3-classDiagram.jpg?raw=true)
+# Left Screen - Sender Computer
+# Right Screen - Reciever Computer
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/2-demo.jpg?raw=true)
+# Theoretical Background & Protocols
+The system relies on well-established theories and protocols in audio processing and computer networking. These principles form the foundation for encoding and decoding the transmitted data via sound waves.
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/4-theoretic.jpg?raw=true)
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/5-theoretic.jpg?raw=true)
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/6-theoretic.jpg?raw=true)
