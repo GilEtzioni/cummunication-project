@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/1e0b5680-9b3b-4b5f-8bc3-4a55b1cad9af)# Computer Science Final Project in Computer Communication (by Gil Etzioni and Zack Portnoy)
+# Computer Science Final Project in Computer Communication (by Gil Etzioni and Zack Portnoy)
 
 Developed a system to transmit data between two computers using speakers and microphones. The sender produces tones, and the receiver listens and decodes the signals. This project showcases skills in audio processing, data transmission, and computer networking.
 
