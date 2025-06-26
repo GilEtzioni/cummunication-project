@@ -2,6 +2,12 @@
 
 Developed a system to transmit data between two computers using speakers and microphones. The sender produces tones, and the receiver listens and decodes the signals. This project showcases skills in audio processing, data transmission, and computer networking.
 
+
+![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/3-classDiagram.jpg?raw=true)
+
+
+
+
 ## Prerequisites
 
 Make sure you have the following installed on your system:
