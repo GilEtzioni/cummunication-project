@@ -6,9 +6,9 @@ Developed a system to transmit data between two computers using speakers and mic
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/3-classDiagram.jpg?raw=true)
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/2-demo.jpg?raw=true)
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/4-theoretic.jpg?raw=true)
-![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/4-theoretic.jpg?raw=true)
+![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/5-theoretic.jpg?raw=true)
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/6-theoretic.jpg?raw=true)
-![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/6-theoretic.jpg?raw=true)
+![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/7-theoretic.jpg?raw=true)
 
 
 ## Prerequisites
