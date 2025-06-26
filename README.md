@@ -8,8 +8,8 @@ The system enables audio-based communication between two computers. The sender g
 
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/3-classDiagram.jpg?raw=true)
 # User Interface
-Left Screen - Sender Computer
-Right Screen - Reciever Computer
+Left Screen - Sender Computer.
+Right Screen - Reciever Computer.
 ![image_alt](https://github.com/GilEtzioni/cummunication-project/blob/main/description/2-demo.jpg?raw=true)
 # Theoretical Background & Protocols
 The system relies on well-established theories and protocols in audio processing and computer networking. These principles form the foundation for encoding and decoding the transmitted data via sound waves.
